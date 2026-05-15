@@ -1,20 +1,91 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { QueryClientProvider } from "@tanstack/react-query";
+import * as SystemUI from "expo-system-ui";
+import { StatusBar } from "expo-status-bar";
+import { ErrorBoundary } from "react-error-boundary";
+import { useEffect } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider } from "react-redux";
+import {
+  DefaultTheme,
+  NavigationContainer,
+  type Theme as NavigationTheme,
+} from "@react-navigation/native";
+
+import { AlertLifecycle } from "@/components/AlertLifecycle";
+import { AppErrorFallback } from "@/components/AppErrorFallback";
+import { FavoritesProvider } from "@/context/FavoritesContext";
+import "@/config/dayjsLocale";
+import { queryClient } from "@/config/queryClient";
+import { useAppFonts } from "@/hooks/useAppFonts";
+import { AppNavigator } from "@/navigation/AppNavigator";
+import { store } from "@/store";
+import { colors } from "@/theme/colors";
+import { setBrandTypographyActive } from "@/theme/typography";
+
+const navigationTheme: NavigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors.background,
+    card: colors.background,
+    text: colors.onSurface,
+    border: colors.outlineVariant,
+    primary: colors.primary,
+  },
+};
 
 export default function App() {
+  const [fontsLoaded, fontError] = useAppFonts();
+  const fontsReady = fontsLoaded || fontError !== null;
+
+  if (fontsReady) {
+    setBrandTypographyActive(Boolean(fontsLoaded && !fontError));
+  }
+
+  useEffect(() => {
+    if (!fontsReady) return;
+    void SystemUI.setBackgroundColorAsync(colors.background);
+  }, [fontsReady]);
+
+  if (!fontsReady) {
+    return (
+      <View style={styles.boot}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        <Provider store={store}>
+          <QueryClientProvider client={queryClient}>
+            <FavoritesProvider>
+              <AlertLifecycle />
+              <ErrorBoundary FallbackComponent={AppErrorFallback}>
+                <NavigationContainer theme={navigationTheme}>
+                  <AppNavigator />
+                </NavigationContainer>
+              </ErrorBoundary>
+              <StatusBar style="dark" />
+            </FavoritesProvider>
+          </QueryClientProvider>
+        </Provider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  boot: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.background,
   },
 });

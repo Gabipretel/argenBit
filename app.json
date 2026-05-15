@@ -4,27 +4,46 @@
     "slug": "argenBit",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo-argenBit.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo-argenBit.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#236391"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "argenBit envía avisos cuando se cumple una alerta de precio o variación que configuraste."
+      },
+      "bundleIdentifier": "ar.com.argenbit.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/logo-argenBit.png",
+        "backgroundColor": "#236391"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "ar.com.argenbit.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/logo-argenBit.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-dev-client",
+      "expo-system-ui",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo-argenBit.png",
+          "color": "#236391",
+          "defaultChannel": "default",
+          "enableBackgroundRemoteNotifications": false
+        }
+      ]
+    ]
   }
 }
