@@ -13,16 +13,14 @@ import {
   type Theme as NavigationTheme,
 } from "@react-navigation/native";
 
-import { AlertLifecycle } from "@/components/AlertLifecycle";
-import { AppErrorFallback } from "@/components/AppErrorFallback";
-import { FavoritesProvider } from "@/context/FavoritesContext";
-import "@/config/dayjsLocale";
-import { queryClient } from "@/config/queryClient";
-import { useAppFonts } from "@/hooks/useAppFonts";
-import { AppNavigator } from "@/navigation/AppNavigator";
-import { store } from "@/store";
-import { colors } from "@/theme/colors";
-import { setBrandTypographyActive } from "@/theme/typography";
+import { AlertLifecycle, AppErrorFallback, useAppFonts } from "@/common";
+import { FavoritesProvider } from "@/features/favorites";
+import "@/core/config/dayjsLocale";
+import { queryClient } from "@/core/config/queryClient";
+import { AppNavigator } from "@/core/navigation/AppNavigator";
+import { store } from "@/core/store";
+import { colors } from "@/core/theme/colors";
+import { setBrandTypographyActive } from "@/core/theme/typography";
 
 const navigationTheme: NavigationTheme = {
   ...DefaultTheme,

@@ -2,7 +2,7 @@ import type { InfiniteData } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 
 import type { NewsArticle } from "@/domain/models/NewsArticle";
-import { newsInfiniteQueryKey } from "@/hooks/useNewsInfiniteQuery";
+import { newsInfiniteQueryKey } from "@/features/news";
 
 export function findNewsArticleById(
   queryClient: QueryClient,

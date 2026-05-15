@@ -1,2 +1,2 @@
-/** Estado global de favoritos — ver `FavoritesProvider` en App. */
-export { useFavorites } from "@/context/FavoritesContext";
+export { FavoritesProvider, useFavorites } from "@/features/favorites/FavoritesContext";
+export type { FavoriteEntry } from "@/storage/favoritesStorage";

@@ -1,5 +1,6 @@
-/** Snapshot detalle — `/data/pricemultifull` + métricas RAW.USD */
+/** Snapshot detalle — CoinStats `GET /coins/{coinId}` */
 export interface AssetDetail {
+  coinId: string;
   fsym: string;
   name: string;
   symbolDisplay: string;

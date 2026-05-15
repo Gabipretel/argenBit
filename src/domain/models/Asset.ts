@@ -1,5 +1,7 @@
 /** Modelo de dominio — lista Mercados / favoritos / alertas. */
 export interface Asset {
+  /** Identificador CoinStats (`/coins` → `id`). */
+  coinId: string;
   rank: number;
   fsym: string;
   name: string;

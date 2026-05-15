@@ -1,43 +1,20 @@
 import type { InfiniteData } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 
-import type {
-  TopCoinEntryDTO,
-  TopMktCapFullResponseDTO,
-} from "@/api/dto/topMktCapFull";
-import { enqueueAlertEvaluation } from "@/alerts/runAlertEvaluation";
+import { enqueueAlertEvaluation } from "@/features/alerts";
 import type { Asset } from "@/domain/models/Asset";
 import type { AssetDetail } from "@/domain/models/AssetDetail";
-
-function patchEntryUsdPrice(
-  entry: TopCoinEntryDTO,
-  fsymUpper: string,
-  priceUsd: number
-): TopCoinEntryDTO {
-  const internal = entry.CoinInfo?.Internal?.toUpperCase();
-  if (internal !== fsymUpper) return entry;
-  const prevUsd = (entry.RAW?.USD ?? {}) as Record<string, unknown>;
-  return {
-    ...entry,
-    RAW: {
-      ...entry.RAW,
-      USD: {
-        ...prevUsd,
-        PRICE: priceUsd,
-      },
-    },
-  };
-}
+import type { MarketsCoinsPage } from "@/features/markets";
 
 /**
- * Actualiza precio en infinite top + detalle activo — §5 (sin Redux).
+ * Actualiza precio en infinite top + detalle activo + favoritos (TanStack Query).
  */
 export function patchPriceInQueryCaches(
   queryClient: QueryClient,
   fsymUpper: string,
   priceUsd: number
 ): void {
-  queryClient.setQueriesData<InfiniteData<TopMktCapFullResponseDTO> | undefined>(
+  queryClient.setQueriesData<InfiniteData<MarketsCoinsPage> | undefined>(
     { queryKey: ["topCoins"] },
     (old) => {
       if (!old?.pages?.length) return old;
@@ -45,8 +22,8 @@ export function patchPriceInQueryCaches(
         ...old,
         pages: old.pages.map((page) => ({
           ...page,
-          Data: (page.Data ?? []).map((entry) =>
-            patchEntryUsdPrice(entry, fsymUpper, priceUsd)
+          items: page.items.map((a) =>
+            a.fsym.toUpperCase() === fsymUpper ? { ...a, priceUsd } : a
           ),
         })),
       };
