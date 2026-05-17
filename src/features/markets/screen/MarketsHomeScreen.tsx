@@ -11,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,6 +29,8 @@ import { useDebouncedValue } from "@/common/hooks/useDebouncedValue";
 import { useMinDurationActive } from "@/common/hooks/useMinDurationActive";
 import { CryptoRow } from "../components/CryptoRow";
 import { CryptoRowSkeleton, CryptoRowSkeletonList } from "../components/CryptoRowSkeleton";
+import { MarketsSearchBar } from "../components/MarketsSearchBar";
+import { marketsEmptySearchCopy } from "../constants/marketsEmptySearchCopy";
 import { MAX_BINANCE_STREAMS } from "@/core/config/binanceWs";
 import {
   flattenTopCoinsPages,
@@ -143,14 +144,16 @@ function MarketsToolbar({
 
 function EmptyMarketsBanner({ searchTerm }: { searchTerm: string }) {
   const q = searchTerm.trim();
-  const fragment = q.length > 0 ? `«${q}»` : "lo que escribiste";
+  const copy = marketsEmptySearchCopy();
   return (
     <View style={styles.emptyBanner} accessibilityRole="text">
-      <MaterialCommunityIcons name="information-outline" size={26} color={colors.primary} />
-      <Text style={styles.emptyBannerText}>
-        No encontramos activos que coincidan con {fragment}. Probá con otro nombre o limpiá la búsqueda
-        para ver el listado completo.
-      </Text>
+      <MaterialCommunityIcons name="magnify-remove-outline" size={24} color={colors.primary} />
+      <View style={styles.emptyBannerBody}>
+        <Text style={styles.emptyBannerTitle}>{copy.title}</Text>
+        <Text style={styles.emptyBannerText}>
+          {q.length > 0 ? copy.bodyWithQuery(q) : copy.bodyFallback}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -257,18 +260,7 @@ export function MarketsHomeScreen() {
           }
         />
         <View style={styles.searchSticky}>
-          <View style={styles.searchWrap}>
-            <MaterialCommunityIcons name="magnify" size={22} color={colors.primary} style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar por nombre o símbolo"
-              placeholderTextColor={colors.onSurfaceVariant}
-              value={searchLocal}
-              onChangeText={setSearchLocal}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+          <MarketsSearchBar value={searchLocal} onChangeText={setSearchLocal} />
         </View>
         <ScrollView
           style={styles.scrollFlex}
@@ -332,18 +324,7 @@ export function MarketsHomeScreen() {
         }
       />
       <View style={styles.searchSticky}>
-        <View style={styles.searchWrap}>
-          <MaterialCommunityIcons name="magnify" size={22} color={colors.primary} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar por nombre o símbolo"
-            placeholderTextColor={colors.onSurfaceVariant}
-            value={searchLocal}
-            onChangeText={setSearchLocal}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </View>
+        <MarketsSearchBar value={searchLocal} onChangeText={setSearchLocal} />
       </View>
       <View style={styles.listShell}>
         {showRefreshSkeleton ? (
@@ -481,43 +462,32 @@ const styles = StyleSheet.create({
   tileTitleOn: {
     color: colors.primary,
   },
-  searchWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-    borderRadius: radii.lg,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.surfaceContainerLowest,
-    ...cardShadow,
-  },
-  searchIcon: {
-    marginRight: 4,
-  },
-  searchInput: {
-    ...typography.bodyMd,
-    flex: 1,
-    paddingVertical: spacing.sm,
-    color: colors.onSurface,
-  },
   emptyBanner: {
     marginBottom: spacing.base,
-    padding: spacing.base,
+    padding: spacing.md,
     borderRadius: radii.lg,
     backgroundColor: colors.surfaceContainerLowest,
     borderWidth: 1,
     borderColor: colors.outlineVariant,
     flexDirection: "row",
     gap: spacing.sm,
-    alignItems: "flex-start",
+    alignItems: "center",
     ...cardShadow,
+  },
+  emptyBannerBody: {
+    flex: 1,
+    gap: 2,
+  },
+  emptyBannerTitle: {
+    ...typography.labelMd,
+    fontWeight: "700",
+    color: colors.primary,
   },
   emptyBannerText: {
     ...typography.bodyMd,
-    flex: 1,
     color: colors.primary,
-    lineHeight: 22,
     fontWeight: "500",
+    lineHeight: 22,
   },
   centered: {
     flex: 1,
