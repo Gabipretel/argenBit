@@ -4,16 +4,6 @@ import type { Asset } from "@/domain/models/Asset";
 import type { MarketPreset } from "@/core/store/slices/filtersSlice";
 import type { RootState } from "@/core/store";
 
-const PRICE_MIN = 100;
-const PRICE_MAX = 5000;
-
-function applyPreset(rows: Asset[], preset: MarketPreset): Asset[] {
-  if (preset === "price") {
-    return rows.filter((a) => a.priceUsd >= PRICE_MIN && a.priceUsd <= PRICE_MAX);
-  }
-  return rows;
-}
-
 function sortForPreset(rows: Asset[], preset: MarketPreset): Asset[] {
   const out = [...rows];
   switch (preset) {
@@ -56,7 +46,6 @@ export const selectFilteredMarketAssets = createSelector(
           a.fsym.toLowerCase().includes(q)
       );
     }
-    rows = applyPreset(rows, marketPreset);
     return sortForPreset(rows, marketPreset);
   }
 );
