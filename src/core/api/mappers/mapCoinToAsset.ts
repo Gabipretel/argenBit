@@ -5,6 +5,19 @@ function mapScore0to100(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function finiteNumber(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+/** Normaliza filas en caché React Query (p. ej. antes de `priceChange1h`). */
+export function ensureAsset(asset: Asset): Asset {
+  return {
+    ...asset,
+    priceChange1h: finiteNumber(asset.priceChange1h),
+    changePercent24Hr: finiteNumber(asset.changePercent24Hr),
+  };
+}
+
 export function mapCoinToAsset(dto: CoinListItemDto, rankFallback: number): Asset {
   const sym = (dto.symbol || "").trim().toUpperCase() || "?";
   return {
@@ -14,6 +27,7 @@ export function mapCoinToAsset(dto: CoinListItemDto, rankFallback: number): Asse
     name: dto.name?.trim() || sym,
     symbolDisplay: sym,
     priceUsd: typeof dto.price === "number" ? dto.price : 0,
+    priceChange1h: typeof dto.priceChange1h === "number" ? dto.priceChange1h : 0,
     changePercent24Hr: typeof dto.priceChange1d === "number" ? dto.priceChange1d : 0,
     marketCapUsd: typeof dto.marketCap === "number" ? dto.marketCap : null,
     volume24hUsd: typeof dto.volume === "number" ? dto.volume : null,

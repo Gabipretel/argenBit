@@ -10,6 +10,7 @@ function asset(partial: Pick<Asset, "fsym" | "priceUsd" | "rank"> & Partial<Asse
     coinId: partial.coinId ?? partial.fsym.toLowerCase(),
     name: partial.name ?? partial.fsym,
     symbolDisplay: partial.symbolDisplay ?? partial.fsym,
+    priceChange1h: partial.priceChange1h ?? 0,
     changePercent24Hr: partial.changePercent24Hr ?? 0,
     marketCapUsd: partial.marketCapUsd ?? null,
     volume24hUsd: partial.volume24hUsd ?? null,
@@ -39,9 +40,9 @@ describe("selectFilteredMarketAssets", () => {
 
   it("preset supply ordena por supply circulante descendente", () => {
     const rows = [
-      asset({ fsym: "ETH", priceUsd: 1, circulatingSupply: 120_000_000 }),
-      asset({ fsym: "BTC", priceUsd: 1, circulatingSupply: 19_800_000 }),
-      asset({ fsym: "DOGE", priceUsd: 1, circulatingSupply: 140_000_000_000 }),
+      asset({ fsym: "ETH", rank: 2, priceUsd: 1, circulatingSupply: 120_000_000 }),
+      asset({ fsym: "BTC", rank: 1, priceUsd: 1, circulatingSupply: 19_800_000 }),
+      asset({ fsym: "DOGE", rank: 3, priceUsd: 1, circulatingSupply: 140_000_000_000 }),
     ];
     const store = configureStore({ reducer: { filters: filtersSlice.reducer } });
     store.dispatch(setMarketPreset("supply"));

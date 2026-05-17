@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { mapCoinToAssetDetail } from "@/core/api/mappers/mapCoinToAssetDetail";
+import {
+  ensureAssetDetail,
+  mapCoinToAssetDetail,
+} from "@/core/api/mappers/mapCoinToAssetDetail";
 import { fetchCoinById } from "@/core/api/repositories/coinsRepository";
 import type { AssetDetail } from "@/domain/models/AssetDetail";
 
@@ -23,6 +26,7 @@ export function useAssetDetailQuery(
   return useQuery({
     queryKey: ["coin", upper] as const,
     queryFn: () => fetchDetail(id, displayName),
+    select: ensureAssetDetail,
     enabled: upper.length > 0 && id.length > 0,
   });
 }

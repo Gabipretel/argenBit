@@ -2,7 +2,9 @@ import type { InfiniteData } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 
 import { enqueueAlertEvaluation } from "@/features/alerts/runAlertEvaluation";
+import { ensureAsset } from "@/core/api/mappers/mapCoinToAsset";
 import type { Asset } from "@/domain/models/Asset";
+import { ensureAssetDetail } from "@/core/api/mappers/mapCoinToAssetDetail";
 import type { AssetDetail } from "@/domain/models/AssetDetail";
 import type { MarketsCoinsPage } from "@/features/markets/hooks/useTopCoinsInfiniteQuery";
 
@@ -29,9 +31,11 @@ export function patchPriceInQueryCaches(
           ...page,
           items: page.items.map((a) => {
             if (a.fsym.toUpperCase() !== sym) return a;
-            return patchChange
-              ? { ...a, priceUsd, changePercent24Hr }
-              : { ...a, priceUsd };
+            return ensureAsset(
+              patchChange
+                ? { ...a, priceUsd, changePercent24Hr }
+                : { ...a, priceUsd }
+            );
           }),
         })),
       };
@@ -42,7 +46,11 @@ export function patchPriceInQueryCaches(
     ["coin", sym],
     (prev) => {
       if (!prev) return prev;
-      return patchChange ? { ...prev, priceUsd, changePercent24Hr } : { ...prev, priceUsd };
+      return ensureAssetDetail(
+        patchChange
+          ? { ...prev, priceUsd, priceChange1d: changePercent24Hr }
+          : { ...prev, priceUsd }
+      );
     }
   );
 
@@ -58,9 +66,11 @@ export function patchPriceInQueryCaches(
           !patchChange || a.changePercent24Hr === changePercent24Hr;
         if (samePrice && sameChange) return a;
         touched = true;
-        return patchChange
-          ? { ...a, priceUsd, changePercent24Hr }
-          : { ...a, priceUsd };
+        return ensureAsset(
+          patchChange
+            ? { ...a, priceUsd, changePercent24Hr }
+            : { ...a, priceUsd }
+        );
       });
       return touched ? next : old;
     }

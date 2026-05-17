@@ -17,7 +17,10 @@ export interface CoinListItemDto {
   price: number;
   volume: number;
   marketCap: number;
+  priceChange1h?: number;
   priceChange1d: number;
+  priceChange1w?: number;
+  priceChange1m?: number;
   availableSupply?: number;
   totalSupply?: number;
   /** 0–100 con `includeRiskScore=true` en `GET /coins`. */
@@ -31,4 +34,3 @@ export interface CoinListResponseDto {
   result: CoinListItemDto[];
 }
 
-export type CoinChartPointDto = [number, number, number, number];

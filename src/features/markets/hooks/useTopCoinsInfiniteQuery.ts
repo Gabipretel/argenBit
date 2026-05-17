@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { fetchCoinsPage } from "@/core/api/repositories/coinsRepository";
-import { mapCoinToAsset } from "@/core/api/mappers/mapCoinToAsset";
+import { ensureAsset, mapCoinToAsset } from "@/core/api/mappers/mapCoinToAsset";
 import type { Asset } from "@/domain/models/Asset";
 import type { MarketDataFeedKind } from "@/core/store/slices/filtersSlice";
 
@@ -57,5 +57,5 @@ export function flattenTopCoinsPages(
   pages: MarketsCoinsPage[] | undefined
 ): Asset[] {
   if (!pages?.length) return [];
-  return pages.flatMap((p) => p.items);
+  return pages.flatMap((p) => p.items.map(ensureAsset));
 }

@@ -1,4 +1,4 @@
-/** Serie 0–1 determinística por activo (mini spark en lista; no es histórico real). */
+/** Serie 0–1 determinística por activo (lista Mercados y detalle; no es histórico real). */
 export function buildSparkSeries(fsym: string, changePct: number, len = 16): number[] {
   let h = 2166136261 >>> 0;
   const s = fsym.toUpperCase();

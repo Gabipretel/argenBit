@@ -17,14 +17,18 @@ interface Props {
 }
 
 export const CryptoRow = memo(function CryptoRow({ asset, onPress }: Props) {
-  const positive = asset.changePercent24Hr > 0;
-  const negative = asset.changePercent24Hr < 0;
+  const change1h =
+    typeof asset.priceChange1h === "number" && Number.isFinite(asset.priceChange1h)
+      ? asset.priceChange1h
+      : 0;
+  const positive = change1h > 0;
+  const negative = change1h < 0;
   const [imageFailed, setImageFailed] = useState(false);
 
   const tone: SparkTone = positive ? "up" : negative ? "down" : "flat";
   const sparkPoints = useMemo(
-    () => buildSparkSeries(asset.fsym, asset.changePercent24Hr),
-    [asset.fsym, asset.changePercent24Hr]
+    () => buildSparkSeries(asset.fsym, change1h),
+    [asset.fsym, change1h]
   );
 
   useEffect(() => {
@@ -95,8 +99,8 @@ export const CryptoRow = memo(function CryptoRow({ asset, onPress }: Props) {
                   !positive && !negative && styles.txtNeutral,
                 ]}
               >
-                {asset.changePercent24Hr >= 0 ? "+" : ""}
-                {asset.changePercent24Hr.toFixed(2)}%
+                {change1h >= 0 ? "+" : ""}
+                {change1h.toFixed(2)}%
               </Text>
             </View>
           </View>
@@ -114,7 +118,7 @@ function pricePropsEqual(prev: Props, next: Props) {
     a.name === b.name &&
     a.symbolDisplay === b.symbolDisplay &&
     a.priceUsd === b.priceUsd &&
-    a.changePercent24Hr === b.changePercent24Hr &&
+    a.priceChange1h === b.priceChange1h &&
     a.imageUrl === b.imageUrl
   );
 }

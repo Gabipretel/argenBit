@@ -48,11 +48,10 @@ export function AssetDetailSkeleton() {
 
       <Ph style={styles.sectionTitlePh} shimmer={shimmer} />
       <View style={styles.segmentRow}>
-        {[1, 2, 3, 4, 5, 6].map((k) => (
+        {[1, 2, 3, 4].map((k) => (
           <Ph key={k} style={styles.segment} shimmer={shimmer} />
         ))}
       </View>
-
       <Ph style={styles.chart} shimmer={shimmer} />
 
       <Ph style={styles.sectionTitlePhWide} shimmer={shimmer} />
@@ -152,7 +151,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
     marginBottom: spacing.md,
-    flexWrap: "wrap",
   },
   segment: {
     width: 52,

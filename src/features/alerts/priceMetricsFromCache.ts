@@ -2,6 +2,7 @@ import type { InfiniteData } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 
 import type { MarketsCoinsPage } from "@/features/markets/hooks/useTopCoinsInfiniteQuery";
+import { ensureAssetDetail } from "@/core/api/mappers/mapCoinToAssetDetail";
 import type { AssetDetail } from "@/domain/models/AssetDetail";
 import type { PriceMetrics } from "./alertConditions";
 import type { Asset } from "@/domain/models/Asset";
@@ -30,11 +31,12 @@ export function getPriceMetricsFromCache(
   queryClient: QueryClient,
   fsymUpper: string
 ): PriceMetrics | null {
-  const detail = queryClient.getQueryData<AssetDetail>(["coin", fsymUpper]);
-  if (detail) {
+  const rawDetail = queryClient.getQueryData<AssetDetail>(["coin", fsymUpper]);
+  if (rawDetail) {
+    const detail = ensureAssetDetail(rawDetail);
     return {
       priceUsd: detail.priceUsd,
-      changePercent24Hr: detail.changePercent24Hr,
+      changePercent24Hr: detail.priceChange1d,
     };
   }
 

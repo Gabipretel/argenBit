@@ -7,6 +7,9 @@ export interface Asset {
   name: string;
   symbolDisplay: string;
   priceUsd: number;
+  /** Variación 1 h (lista Mercados). */
+  priceChange1h: number;
+  /** Variación 24 h — alertas y parches WS Binance. */
   changePercent24Hr: number;
   marketCapUsd: number | null;
   /** Volumen 24h en USD según CoinStats, si el listado lo incluye. */

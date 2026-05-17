@@ -67,13 +67,3 @@ export async function fetchCoinBySymbol(
   return data.result?.[0] ?? null;
 }
 
-export async function fetchCoinChart(
-  coinId: string,
-  period: string
-): Promise<number[][]> {
-  const { data } = await httpClient.get<number[][]>(
-    `/coins/${encodeURIComponent(coinId)}/charts`,
-    { params: { period } }
-  );
-  return Array.isArray(data) ? data : [];
-}

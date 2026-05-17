@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
 import type { ComponentProps } from "react";
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo } from "react";
 import {
   Platform,
   Pressable,
@@ -29,18 +29,8 @@ import { useFavorites } from "@/features/favorites/FavoritesContext";
 import { AssetDetailSkeleton } from "../components/AssetDetailSkeleton";
 import { PriceChart } from "../components/PriceChart";
 import { useAssetDetailQuery } from "../hooks/useAssetDetailQuery";
-import { useAssetHistoryQuery } from "../hooks/useAssetHistoryQuery";
-import type { HistoryRangeId, PriceHistoryPoint } from "@/domain/models/AssetDetail";
+import { priceChangeHorizonsFromDetail } from "../utils/priceChangeHorizons";
 import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
-
-
-const RANGE_OPTIONS: { id: HistoryRangeId; label: string }[] = [
-  { id: "24h", label: "24 h" },
-  { id: "7d", label: "7 d" },
-  { id: "6m", label: "6 m" },
-  { id: "1y", label: "1 a" },
-  { id: "all", label: "Todo" },
-];
 
 export function AssetDetailScreen() {
   const navigation = useNavigation();
@@ -54,15 +44,16 @@ export function AssetDetailScreen() {
     volatilityScore,
     liquidityScore,
   } = route.params as AssetDetailParams;
-  const [range, setRange] = useState<HistoryRangeId>("7d");
   const { isFavorite, toggle } = useFavorites();
   const fav = isFavorite(fsym);
 
   useBinancePriceStream([fsym.trim().toUpperCase()], isFocused);
 
   const detailQuery = useAssetDetailQuery(fsym, coinId, displayName);
-  const historyQuery = useAssetHistoryQuery(coinId, range);
-  const chartPoints: PriceHistoryPoint[] = historyQuery.data ?? [];
+  const horizonPoints = useMemo(
+    () => (detailQuery.data ? priceChangeHorizonsFromDetail(detailQuery.data) : []),
+    [detailQuery.data]
+  );
 
   useLayoutEffect(() => {
     const label = (displayName?.trim() || fsym.toUpperCase()).trim();
@@ -87,16 +78,13 @@ export function AssetDetailScreen() {
   }, [navigation, fsym, coinId, displayName, fav, toggle]);
 
   const refreshAssetDetail = useCallback(() => {
-    void Promise.all([detailQuery.refetch(), historyQuery.refetch()]);
-  }, [detailQuery, historyQuery]);
+    void detailQuery.refetch();
+  }, [detailQuery]);
 
-  /** No mezclar el primer fetch del histórico con el spinner de pull (evita parpadeos y “no aparece”). */
-  const isChartLoadingInitially = historyQuery.isPending && chartPoints.length === 0;
-  const isDetailRefreshing =
-    Boolean(detailQuery.data) &&
-    !isChartLoadingInitially &&
-    (detailQuery.isFetching || historyQuery.isFetching);
-  const showPullRefreshSpinner = useMinDurationActive(isDetailRefreshing, 550);
+  const showPullRefreshSpinner = useMinDurationActive(
+    Boolean(detailQuery.data) && detailQuery.isFetching,
+    550
+  );
 
   const detailRefreshControl = useMemo(
     () => (
@@ -132,8 +120,8 @@ export function AssetDetailScreen() {
   }
 
   const d = detailQuery.data;
-  const positive = d.changePercent24Hr > 0;
-  const negative = d.changePercent24Hr < 0;
+  const positive = d.priceChange1h > 0;
+  const negative = d.priceChange1h < 0;
 
   return (
     <View style={styles.pageRoot}>
@@ -194,46 +182,17 @@ export function AssetDetailScreen() {
                       !positive && !negative && styles.changeTxtNeutral,
                     ]}
                   >
-                    {d.changePercent24Hr >= 0 ? "+" : ""}
-                    {d.changePercent24Hr.toFixed(2)}%
+                    {d.priceChange1h >= 0 ? "+" : ""}
+                    {d.priceChange1h.toFixed(2)}%
                   </Text>
                 </View>
               </View>
             </View>
-            <Text style={styles.heroSubnote}>Variación 24 h</Text>
+            <Text style={styles.heroSubnote}>Variación 1 h</Text>
           </View>
 
           <Text style={styles.sectionTitle}>Rendimiento</Text>
-          <View style={styles.segmentStrip}>
-            <ScrollView
-              horizontal
-              nestedScrollEnabled
-              showsHorizontalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              style={styles.segmentScroll}
-              contentContainerStyle={styles.segmentRowContent}
-            >
-              {RANGE_OPTIONS.map((opt) => (
-                <Pressable
-                  key={opt.id}
-                  onPress={() => setRange(opt.id)}
-                  style={[styles.segment, range === opt.id && styles.segmentActive]}
-                >
-                  <Text
-                    style={[styles.segmentTxt, range === opt.id && styles.segmentTxtActive]}
-                  >
-                    {opt.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </View>
-
-          <PriceChart
-            data={chartPoints}
-            isLoading={historyQuery.isPending && chartPoints.length === 0}
-            changePct24h={d.changePercent24Hr}
-          />
+          <PriceChart fsym={d.fsym} points={horizonPoints} />
 
           <Text style={styles.sectionTitleMetrics}>Métricas</Text>
           <View style={styles.grid}>
@@ -360,17 +319,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     flexGrow: 1,
   },
-  segmentStrip: {
-    alignSelf: "stretch",
-    height: 46,
-    marginBottom: spacing.sm,
-    flexGrow: 0,
-    flexShrink: 0,
-  },
-  segmentScroll: {
-    flexGrow: 0,
-    maxHeight: 46,
-  },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -477,7 +425,7 @@ const styles = StyleSheet.create({
     ...typography.headlineMd,
     color: colors.primary,
     fontWeight: "700",
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
     marginTop: spacing.xs,
   },
   sectionTitleMetrics: {
@@ -486,40 +434,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: spacing.sm,
     marginTop: spacing.xl,
-  },
-  segmentRowContent: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingRight: spacing.lg,
-    paddingVertical: 0,
-    flexGrow: 0,
-  },
-  segment: {
-    alignSelf: "flex-start",
-    paddingHorizontal: spacing.md,
-    paddingVertical: 10,
-    minWidth: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: radii.md,
-    backgroundColor: colors.surfaceContainerLowest,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-  },
-  segmentActive: {
-    backgroundColor: "rgba(35, 99, 145, 0.1)",
-    borderColor: colors.primary,
-    borderRadius: radii.md,
-  },
-  segmentTxt: {
-    ...typography.labelMd,
-    color: colors.onSurfaceVariant,
-  },
-  segmentTxtActive: {
-    color: colors.primary,
-    fontWeight: "700",
   },
   chartErr: {
     color: colors.error,

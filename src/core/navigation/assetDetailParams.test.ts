@@ -8,6 +8,7 @@ const asset: Asset = {
   name: "Bitcoin",
   symbolDisplay: "BTC",
   priceUsd: 80_000,
+  priceChange1h: -0.12,
   changePercent24Hr: 1,
   marketCapUsd: 1e12,
   volume24hUsd: 1e10,
