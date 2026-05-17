@@ -1,6 +1,10 @@
 import type { CoinListItemDto } from "@/core/api/dto/coinList";
 import type { Asset } from "@/domain/models/Asset";
 
+function mapScore0to100(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
 export function mapCoinToAsset(dto: CoinListItemDto, rankFallback: number): Asset {
   const sym = (dto.symbol || "").trim().toUpperCase() || "?";
   return {
@@ -13,6 +17,11 @@ export function mapCoinToAsset(dto: CoinListItemDto, rankFallback: number): Asse
     changePercent24Hr: typeof dto.priceChange1d === "number" ? dto.priceChange1d : 0,
     marketCapUsd: typeof dto.marketCap === "number" ? dto.marketCap : null,
     volume24hUsd: typeof dto.volume === "number" ? dto.volume : null,
+    circulatingSupply:
+      typeof dto.availableSupply === "number" ? dto.availableSupply : null,
+    riskScore: mapScore0to100(dto.riskScore),
+    volatilityScore: mapScore0to100(dto.volatilityScore),
+    liquidityScore: mapScore0to100(dto.liquidityScore),
     imageUrl: dto.icon?.trim() || null,
   };
 }

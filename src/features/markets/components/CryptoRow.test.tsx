@@ -13,6 +13,10 @@ const mockAsset: Asset = {
   changePercent24Hr: 1.25,
   marketCapUsd: 1e12,
   volume24hUsd: null,
+  circulatingSupply: 19_500_000,
+  riskScore: 3.6,
+  volatilityScore: 3.8,
+  liquidityScore: 92.9,
   imageUrl: null,
 };
 

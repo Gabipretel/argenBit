@@ -11,5 +11,11 @@ export interface Asset {
   marketCapUsd: number | null;
   /** Volumen 24h en USD según CoinStats, si el listado lo incluye. */
   volume24hUsd: number | null;
+  /** Supply circulante (`availableSupply` en CoinStats). */
+  circulatingSupply: number | null;
+  /** Puntajes CoinStats (0–100), listado con `includeRiskScore=true`. */
+  riskScore: number | null;
+  volatilityScore: number | null;
+  liquidityScore: number | null;
   imageUrl: string | null;
 }

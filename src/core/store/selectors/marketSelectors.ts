@@ -20,8 +20,10 @@ function sortForPreset(rows: Asset[], preset: MarketPreset): Asset[] {
         return mb - ma;
       });
       break;
-    case "rank50":
-      out.sort((a, b) => a.rank - b.rank);
+    case "supply":
+      out.sort(
+        (a, b) => (b.circulatingSupply ?? -1) - (a.circulatingSupply ?? -1)
+      );
       break;
     default:
       break;

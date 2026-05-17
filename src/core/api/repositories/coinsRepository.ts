@@ -21,6 +21,7 @@ export async function fetchCoinsPage(
       currency,
       sortBy,
       sortDir: "desc",
+      includeRiskScore: true,
     },
   });
   return data;
@@ -48,6 +49,7 @@ export async function fetchCoinsByIds(
       coinIds: ids.join(","),
       currency,
       limit: Math.min(ids.length, 250),
+      includeRiskScore: true,
     },
   });
   return data.result ?? [];
@@ -60,7 +62,7 @@ export async function fetchCoinBySymbol(
   const sym = symbolUpper.trim().toUpperCase();
   if (!sym) return null;
   const { data } = await httpClient.get<CoinListResponseDto>("/coins", {
-    params: { symbol: sym, currency, limit: 1 },
+    params: { symbol: sym, currency, limit: 1, includeRiskScore: true },
   });
   return data.result?.[0] ?? null;
 }

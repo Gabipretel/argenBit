@@ -1,11 +1,13 @@
+import type { AssetDetailParams } from "./assetDetailParams";
+
 export type MarketsStackParamList = {
   MarketsHome: undefined;
-  AssetDetail: { fsym: string; coinId: string; displayName?: string; rank?: number };
+  AssetDetail: AssetDetailParams;
 };
 
 export type FavoritesStackParamList = {
   FavoritesHome: undefined;
-  AssetDetail: { fsym: string; coinId: string; displayName?: string; rank?: number };
+  AssetDetail: AssetDetailParams;
 };
 
 export type NewsStackParamList = {

@@ -20,6 +20,10 @@ export interface CoinListItemDto {
   priceChange1d: number;
   availableSupply?: number;
   totalSupply?: number;
+  /** 0–100 con `includeRiskScore=true` en `GET /coins`. */
+  riskScore?: number;
+  volatilityScore?: number;
+  liquidityScore?: number;
 }
 
 export interface CoinListResponseDto {

@@ -18,9 +18,11 @@ import { useBinancePriceStream } from "@/common/hooks/useBinancePriceStream";
 import { useMinDurationActive } from "@/common/hooks/useMinDurationActive";
 import {
   formatCompactNumber,
+  formatScore0to100,
   formatSupply,
   formatUsd,
 } from "@/common/utils/formatters";
+import type { AssetDetailParams } from "@/core/navigation/assetDetailParams";
 import { AnimatedUsdPrice } from "@/features/markets/components/AnimatedUsdPrice";
 import { CryptoRowSkeletonList } from "@/features/markets/components/CryptoRowSkeleton";
 import { useFavorites } from "@/features/favorites/FavoritesContext";
@@ -31,12 +33,6 @@ import { useAssetHistoryQuery } from "../hooks/useAssetHistoryQuery";
 import type { HistoryRangeId, PriceHistoryPoint } from "@/domain/models/AssetDetail";
 import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
 
-interface AssetDetailRouteParams {
-  fsym: string;
-  coinId: string;
-  displayName?: string;
-  rank?: number;
-}
 
 const RANGE_OPTIONS: { id: HistoryRangeId; label: string }[] = [
   { id: "24h", label: "24 h" },
@@ -50,7 +46,14 @@ export function AssetDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
-  const { fsym, coinId, displayName, rank } = route.params as AssetDetailRouteParams;
+  const {
+    fsym,
+    coinId,
+    displayName,
+    riskScore,
+    volatilityScore,
+    liquidityScore,
+  } = route.params as AssetDetailParams;
   const [range, setRange] = useState<HistoryRangeId>("7d");
   const { isFavorite, toggle } = useFavorites();
   const fav = isFavorite(fsym);
@@ -255,10 +258,25 @@ export function AssetDetailScreen() {
               }
             />
             <MetricTile
-              variant="rank"
-              icon="podium"
-              label="Ranking"
-              value={rank != null ? `#${rank}` : "—"}
+              variant="risk"
+              icon="shield-alert-outline"
+              label="Riesgo"
+              value={riskScore != null ? formatScore0to100(riskScore) : "—"}
+              hint="/100"
+            />
+            <MetricTile
+              variant="volatility"
+              icon="chart-timeline-variant"
+              label="Volatilidad"
+              value={volatilityScore != null ? formatScore0to100(volatilityScore) : "—"}
+              hint="/100"
+            />
+            <MetricTile
+              variant="liquidity"
+              icon="water-outline"
+              label="Liquidez"
+              value={liquidityScore != null ? formatScore0to100(liquidityScore) : "—"}
+              hint="/100"
             />
           </View>
         </ScrollView>
@@ -271,7 +289,9 @@ const TILE_ICONS = {
   cap: colors.primary,
   vol: colors.success,
   circ: "#7c3aed" as const,
-  rank: colors.tabBarActive,
+  risk: colors.error,
+  volatility: "#d97706" as const,
+  liquidity: "#0891b2" as const,
 } as const;
 
 function MetricTile({
@@ -279,11 +299,13 @@ function MetricTile({
   icon,
   label,
   value,
+  hint,
 }: {
   variant: keyof typeof TILE_ICONS;
   icon: ComponentProps<typeof MaterialCommunityIcons>["name"];
   label: string;
   value: string;
+  hint?: string;
 }) {
   const iconColor = TILE_ICONS[variant];
   return (
@@ -296,6 +318,9 @@ function MetricTile({
       </View>
       <Text style={styles.tileValue} numberOfLines={2}>
         {value}
+        {hint && value !== "—" ? (
+          <Text style={styles.tileValueHint}>{hint}</Text>
+        ) : null}
       </Text>
     </View>
   );
@@ -535,5 +560,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.onSurface,
     fontVariant: ["tabular-nums"],
+  },
+  tileValueHint: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.onSurfaceVariant,
   },
 });

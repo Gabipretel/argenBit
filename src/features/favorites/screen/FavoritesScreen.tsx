@@ -32,6 +32,7 @@ import { FavoritesSuggestionsSection } from "../components/FavoritesSuggestionsS
 import { useFavoriteAssetsQuery } from "../hooks/useFavoriteAssetsQuery";
 import { useFavorites } from "../FavoritesContext";
 import type { Asset } from "@/domain/models/Asset";
+import { assetDetailParamsFromAsset } from "@/core/navigation/assetDetailParams";
 import type { FavoritesStackParamList, MainTabParamList } from "@/core/navigation/types";
 import { colors, spacing, typography } from "@/core/theme";
 
@@ -94,12 +95,7 @@ export function FavoritesScreen() {
 
   const navigateToAssetDetail = useCallback(
     (asset: Asset) => {
-      navigation.navigate("AssetDetail", {
-        fsym: asset.fsym,
-        coinId: asset.coinId,
-        displayName: asset.name,
-        rank: asset.rank,
-      });
+      navigation.navigate("AssetDetail", assetDetailParamsFromAsset(asset));
     },
     [navigation]
   );

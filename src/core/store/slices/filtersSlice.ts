@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 /** Vista de mercado — cuadrícula 2×2 (define filtro + fuente de datos). */
-export type MarketPreset = "price" | "volume" | "cap100" | "rank50";
+export type MarketPreset = "price" | "volume" | "cap100" | "supply";
 
 /** Orden del listado CoinStats: `mcap` (precio, cap, ranking) o `volume` (preset volumen). */
 export type MarketDataFeedKind = "mcap" | "volume";
@@ -17,7 +17,7 @@ export interface FiltersState {
 
 const initialState: FiltersState = {
   searchTerm: "",
-  marketPreset: "rank50",
+  marketPreset: "cap100",
 };
 
 export const filtersSlice = createSlice({

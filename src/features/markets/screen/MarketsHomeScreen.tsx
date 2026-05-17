@@ -35,6 +35,7 @@ import {
   flattenTopCoinsPages,
   useTopCoinsInfiniteQuery,
 } from "../hooks/useTopCoinsInfiniteQuery";
+import { assetDetailParamsFromAsset } from "@/core/navigation/assetDetailParams";
 import type { MainTabParamList, MarketsStackParamList } from "@/core/navigation/types";
 import type { Asset } from "@/domain/models/Asset";
 import {
@@ -129,10 +130,10 @@ function MarketsToolbar({
             title="Market cap"
           />
           <FilterTile
-            active={p === "rank50"}
-            onPress={() => onSelectPreset("rank50")}
-            icon="format-list-numbered"
-            title="Ranking"
+            active={p === "supply"}
+            onPress={() => onSelectPreset("supply")}
+            icon="infinity"
+            title="Circulante"
           />
         </View>
       </View>
@@ -196,12 +197,7 @@ export function MarketsHomeScreen() {
   useBinancePriceStream(streamSymbols, isFocused);
 
   const onPressAsset = (asset: Asset) => {
-    navigation.navigate("AssetDetail", {
-      fsym: asset.fsym,
-      coinId: asset.coinId,
-      displayName: asset.name,
-      rank: asset.rank,
-    });
+    navigation.navigate("AssetDetail", assetDetailParamsFromAsset(asset));
   };
 
   const goFavorites = () => {

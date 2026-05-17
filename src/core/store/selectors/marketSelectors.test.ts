@@ -13,6 +13,10 @@ function asset(partial: Pick<Asset, "fsym" | "priceUsd" | "rank"> & Partial<Asse
     changePercent24Hr: partial.changePercent24Hr ?? 0,
     marketCapUsd: partial.marketCapUsd ?? null,
     volume24hUsd: partial.volume24hUsd ?? null,
+    circulatingSupply: partial.circulatingSupply ?? null,
+    riskScore: partial.riskScore ?? null,
+    volatilityScore: partial.volatilityScore ?? null,
+    liquidityScore: partial.liquidityScore ?? null,
     imageUrl: partial.imageUrl ?? null,
     ...partial,
   };
@@ -31,5 +35,21 @@ describe("selectFilteredMarketAssets", () => {
 
     const sorted = selectFilteredMarketAssets(store.getState(), rows);
     expect(sorted.map((a) => a.fsym)).toEqual(["BTC", "ETH", "DOGE"]);
+  });
+
+  it("preset supply ordena por supply circulante descendente", () => {
+    const rows = [
+      asset({ fsym: "ETH", priceUsd: 1, circulatingSupply: 120_000_000 }),
+      asset({ fsym: "BTC", priceUsd: 1, circulatingSupply: 19_800_000 }),
+      asset({ fsym: "DOGE", priceUsd: 1, circulatingSupply: 140_000_000_000 }),
+    ];
+    const store = configureStore({ reducer: { filters: filtersSlice.reducer } });
+    store.dispatch(setMarketPreset("supply"));
+
+    expect(selectFilteredMarketAssets(store.getState(), rows).map((a) => a.fsym)).toEqual([
+      "DOGE",
+      "ETH",
+      "BTC",
+    ]);
   });
 });
