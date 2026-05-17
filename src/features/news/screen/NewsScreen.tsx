@@ -1,9 +1,8 @@
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Platform,
   RefreshControl,
   ScrollView,
@@ -13,14 +12,23 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppTopBar, ErrorCallout, useMinDurationActive } from "@/common";
+import {
+  AppListLoadMoreIndicator,
+  AppTopBar,
+  ErrorCallout,
+  LIST_PAGINATION_END_THRESHOLD,
+  MIN_LIST_LOAD_MORE_VISIBLE_MS,
+  useMinDurationActive,
+  useScrollListToEndOnLoadMore,
+} from "@/common";
+import type { NewsArticle } from "@/domain/models/NewsArticle";
 import { NewsFeedSkeleton } from "../components/NewsRowSkeleton";
 import { NewsListHeader } from "../components/NewsListHeader";
 import { NewsRow } from "../components/NewsRow";
 import { flattenNewsPages, useNewsInfiniteQuery } from "../hooks/useNewsInfiniteQuery";
 import { env } from "@/core/config/env";
 import type { NewsStackParamList } from "@/core/navigation/types";
-import { colors, spacing, typography } from "@/core/theme";
+import { colors, spacing } from "@/core/theme";
 
 const MIN_SKELETON_UI_MS = 600;
 /** Mantiene el spinner del RefreshControl el tiempo mínimo (evita fallos al repetir el gesto en RN/FlashList). */
@@ -31,6 +39,7 @@ type Nav = NativeStackNavigationProp<NewsStackParamList, "NewsHome">;
 export function NewsScreen() {
   const navigation = useNavigation<Nav>();
   const query = useNewsInfiniteQuery();
+  const listRef = useRef<FlashListRef<NewsArticle>>(null);
   const [manualPullRefresh, setManualPullRefresh] = useState(false);
 
   const articles = useMemo(
@@ -51,7 +60,12 @@ export function NewsScreen() {
     MIN_PULL_TO_REFRESH_SPINNER_MS
   );
   const showRefreshSkeleton = useMinDurationActive(isPullToRefreshActive, MIN_SKELETON_UI_MS);
-  const showLoadMoreSkeleton = useMinDurationActive(query.isFetchingNextPage, MIN_SKELETON_UI_MS);
+  const showLoadMoreSkeleton = useMinDurationActive(
+    query.isFetchingNextPage,
+    MIN_LIST_LOAD_MORE_VISIBLE_MS
+  );
+
+  useScrollListToEndOnLoadMore(listRef, showLoadMoreSkeleton);
 
   const refreshNewsFeed = useCallback(async () => {
     setManualPullRefresh(true);
@@ -127,6 +141,7 @@ export function NewsScreen() {
           </View>
         ) : null}
         <FlashList
+          ref={listRef}
           style={styles.listFlex}
           extraData={`${query.isFetchingNextPage}-${showLoadMoreSkeleton}-${articles.length}-${showPullRefreshSpinner}`}
           data={articles}
@@ -144,15 +159,12 @@ export function NewsScreen() {
           ListFooterComponent={
             showLoadMoreSkeleton ? (
               <View style={styles.footerMore}>
-                <View style={styles.footerLoadingRow}>
-                  <ActivityIndicator size="small" color={colors.primary} />
-                  <Text style={styles.footerLoadingTxt}>Cargando más noticias…</Text>
-                </View>
+                <AppListLoadMoreIndicator message="Cargando más noticias…" />
               </View>
             ) : null
           }
           onEndReached={loadMoreNewsArticles}
-          onEndReachedThreshold={0.55}
+          onEndReachedThreshold={LIST_PAGINATION_END_THRESHOLD}
         />
       </View>
     </SafeAreaView>
@@ -205,16 +217,5 @@ const styles = StyleSheet.create({
   footerMore: {
     paddingTop: spacing.sm,
     paddingBottom: spacing.lg,
-  },
-  footerLoadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.sm,
-  },
-  footerLoadingTxt: {
-    ...typography.caption,
-    color: colors.onSurfaceVariant,
-    fontWeight: "600",
   },
 });

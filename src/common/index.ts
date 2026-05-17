@@ -4,6 +4,12 @@ export { AlertLifecycle } from "./components/AlertLifecycle";
 export { AppErrorFallback } from "./components/AppErrorFallback";
 export { AppTopBar } from "./components/layout/AppTopBar";
 export { AppFriendlyLoader } from "./components/ui/AppFriendlyLoader";
+export {
+  AppListLoadMoreIndicator,
+  LIST_PAGINATION_END_THRESHOLD,
+  MIN_LIST_LOAD_MORE_VISIBLE_MS,
+} from "./components/ui/AppListLoadMoreIndicator";
+export { useScrollListToEndOnLoadMore } from "./hooks/useScrollListToEndOnLoadMore";
 export { AppRefreshBanner } from "./components/ui/AppRefreshBanner";
 export { ErrorCallout } from "./components/ui/ErrorCallout";
 

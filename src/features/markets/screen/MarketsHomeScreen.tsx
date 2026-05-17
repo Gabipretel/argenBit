@@ -1,12 +1,11 @@
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import type { CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -19,6 +18,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import { AppTopBar } from "@/common/components/layout/AppTopBar";
+import {
+  AppListLoadMoreIndicator,
+  LIST_PAGINATION_END_THRESHOLD,
+  MIN_LIST_LOAD_MORE_VISIBLE_MS,
+} from "@/common/components/ui/AppListLoadMoreIndicator";
+import { useScrollListToEndOnLoadMore } from "@/common/hooks/useScrollListToEndOnLoadMore";
 import { ErrorCallout } from "@/common/components/ui/ErrorCallout";
 import { useBinancePriceStream } from "@/common/hooks/useBinancePriceStream";
 import { useDebouncedValue } from "@/common/hooks/useDebouncedValue";
@@ -164,6 +169,7 @@ export function MarketsHomeScreen() {
 
   const feedKind = dataFeedForPreset(filters.marketPreset);
   const query = useTopCoinsInfiniteQuery(feedKind);
+  const listRef = useRef<FlashListRef<Asset>>(null);
 
   const listBase = useMemo(
     () => flattenTopCoinsPages(query.data?.pages),
@@ -213,11 +219,16 @@ export function MarketsHomeScreen() {
     MIN_PULL_TO_REFRESH_SPINNER_MS
   );
   const showRefreshSkeleton = useMinDurationActive(isMarketListRefreshing, MIN_SKELETON_UI_MS);
-  const showLoadMoreMinHold = useMinDurationActive(query.isFetchingNextPage, MIN_SKELETON_UI_MS);
+  const showLoadMoreMinHold = useMinDurationActive(
+    query.isFetchingNextPage,
+    MIN_LIST_LOAD_MORE_VISIBLE_MS
+  );
   const showLoadMoreFooter =
     filtered.length > 0 &&
     query.hasNextPage &&
     (query.isFetchingNextPage || showLoadMoreMinHold);
+
+  useScrollListToEndOnLoadMore(listRef, showLoadMoreMinHold);
 
   const onEndReachedMarkets = useCallback(() => {
     if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
@@ -345,6 +356,7 @@ export function MarketsHomeScreen() {
           </View>
         ) : null}
         <FlashList
+          ref={listRef}
           key={`${feedKind}-${filters.marketPreset}`}
           extraData={`${query.dataUpdatedAt}-${query.isFetchingNextPage}-${showLoadMoreMinHold}`}
           style={styles.flashFlex}
@@ -356,7 +368,7 @@ export function MarketsHomeScreen() {
           contentContainerStyle={styles.listContent}
           refreshControl={marketListRefreshControl}
           onEndReached={onEndReachedMarkets}
-          onEndReachedThreshold={0.55}
+          onEndReachedThreshold={LIST_PAGINATION_END_THRESHOLD}
           ListHeaderComponent={
             <>
               <MarketsToolbar filters={filters} onSelectPreset={onSelectPreset} />
@@ -368,10 +380,7 @@ export function MarketsHomeScreen() {
           ListFooterComponent={
             showLoadMoreFooter ? (
               <View style={styles.footerBlock}>
-                <View style={styles.footerLoadingRow}>
-                  <ActivityIndicator size="small" color={colors.primary} />
-                  <Text style={styles.footerLoadingTxt}>Cargando más activos…</Text>
-                </View>
+                <AppListLoadMoreIndicator message="Cargando más activos…" />
               </View>
             ) : null
           }
@@ -523,17 +532,5 @@ const styles = StyleSheet.create({
   footerBlock: {
     paddingBottom: spacing.lg,
     paddingTop: spacing.sm,
-  },
-  footerLoadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  footerLoadingTxt: {
-    ...typography.caption,
-    color: colors.onSurfaceVariant,
-    fontWeight: "600",
   },
 });

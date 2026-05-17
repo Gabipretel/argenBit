@@ -1,6 +1,5 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -72,15 +71,10 @@ export function MainTabNavigator() {
       <Tab.Screen
         name="Noticias"
         component={NewsStackNavigator}
-        options={({ route }) => {
-          const focused = getFocusedRouteNameFromRoute(route) ?? "NewsHome";
-          const hideTabBar = focused === "NewsDetail";
-          return {
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="newspaper" color={color} size={size} />
-            ),
-            tabBarStyle: hideTabBar ? { display: "none" } : tabBarVisibleStyle,
-          };
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="newspaper" color={color} size={size} />
+          ),
         }}
       />
       <Tab.Screen

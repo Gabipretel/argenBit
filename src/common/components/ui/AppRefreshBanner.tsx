@@ -22,7 +22,7 @@ export function AppRefreshBanner({ visible, title, message }: AppRefreshBannerPr
       accessibilityRole="text"
       accessibilityLabel={[title, message].filter(Boolean).join(". ")}
     >
-      <ActivityIndicator size="small" color={colors.primary} style={styles.spinner} />
+      <ActivityIndicator size="large" color={colors.primary} style={styles.spinner} />
       <View style={styles.textCol}>
         <Text style={styles.title}>{title}</Text>
         {message ? <Text style={styles.message}>{message}</Text> : null}
@@ -59,9 +59,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   message: {
-    ...typography.caption,
-    color: colors.onSurfaceVariant,
+    ...typography.bodyMd,
+    color: colors.primary,
+    fontWeight: "600",
     marginTop: 4,
-    lineHeight: 18,
+    lineHeight: 20,
   },
 });
