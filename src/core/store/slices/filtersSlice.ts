@@ -3,7 +3,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 /** Vista de mercado — cuadrícula 2×2 (define filtro + fuente de datos). */
 export type MarketPreset = "price" | "volume" | "cap100" | "rank50";
 
-/** Feed CryptoCompare: cap para precio / cap / ranking; volumen para filtro volumen. */
+/** Orden del listado CoinStats: `mcap` (precio, cap, ranking) o `volume` (preset volumen). */
 export type MarketDataFeedKind = "mcap" | "volume";
 
 export function dataFeedForPreset(preset: MarketPreset): MarketDataFeedKind {

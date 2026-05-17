@@ -9,7 +9,7 @@ function hashStr(s: string): number {
   return h;
 }
 
-/** Pastilla visual (la API de CryptoCompare no trae categorías editoriales). */
+/** Etiqueta decorativa en la fila: el feed no trae categoría editorial, se asigna por hash del id. */
 export type NewsPillStyle = { label: string; bg: string; fg: string };
 
 const PILL_PRESETS: NewsPillStyle[] = [

@@ -30,7 +30,7 @@ import {
   FavoritesListInitialSkeleton,
 } from "../components/FavoritesLayoutSkeleton";
 import { useFavoriteAssetsQuery } from "../hooks/useFavoriteAssetsQuery";
-import { useFavorites } from "@/hooks/useFavorites";
+import { useFavorites } from "@/features/favorites";
 import type { Asset } from "@/domain/models/Asset";
 import type { FavoritesStackParamList, MainTabParamList } from "@/core/navigation/types";
 import { colors, cardShadow, radii, spacing, typography } from "@/core/theme";

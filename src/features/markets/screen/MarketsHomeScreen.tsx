@@ -28,7 +28,6 @@ import {
 import { CryptoRow } from "../components/CryptoRow";
 import { CryptoRowSkeleton, CryptoRowSkeletonList } from "../components/CryptoRowSkeleton";
 import { MAX_BINANCE_STREAMS } from "@/core/config/binanceWs";
-import { env } from "@/core/config/env";
 import {
   flattenTopCoinsPages,
   useTopCoinsInfiniteQuery,

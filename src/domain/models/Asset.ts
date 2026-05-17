@@ -9,7 +9,7 @@ export interface Asset {
   priceUsd: number;
   changePercent24Hr: number;
   marketCapUsd: number | null;
-  /** Volumen 24h en USD (CryptoCompare RAW.USD), si viene en el feed. */
+  /** Volumen 24h en USD según CoinStats, si el listado lo incluye. */
   volume24hUsd: number | null;
   imageUrl: string | null;
 }

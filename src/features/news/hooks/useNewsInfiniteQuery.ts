@@ -2,7 +2,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { mapNewsFeedItem } from "@/core/api/mappers/mapNewsFeedItem";
 import { fetchNewsPage } from "@/core/api/repositories/newsRepository";
-import { env } from "@/core/config/env";
 import type { NewsArticle } from "@/domain/models/NewsArticle";
 
 export const NEWS_PAGE_SIZE = 15;
@@ -22,12 +21,7 @@ export function useNewsInfiniteQuery() {
   return useInfiniteQuery({
     queryKey: newsInfiniteQueryKey,
     initialPageParam: 1,
-    queryFn: ({ pageParam }) => {
-      if (!env.coinstatsApiKey.trim()) {
-        throw new Error("Se requiere EXPO_PUBLIC_COINSTATS_API_KEY para noticias.");
-      }
-      return fetchPage(pageParam as number);
-    },
+    queryFn: ({ pageParam }) => fetchPage(pageParam as number),
     getNextPageParam: (lastPage, _all, lastPageParam) => {
       if (lastPage.length < NEWS_PAGE_SIZE) return undefined;
       return (lastPageParam as number) + 1;

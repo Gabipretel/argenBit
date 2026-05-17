@@ -22,7 +22,7 @@ import {
   useMinDurationActive,
 } from "@/common";
 import { AnimatedUsdPrice, CryptoRowSkeletonList } from "@/features/markets";
-import { useFavorites } from "@/hooks/useFavorites";
+import { useFavorites } from "@/features/favorites";
 import { AssetDetailSkeleton } from "../components/AssetDetailSkeleton";
 import { PriceChart } from "../components/PriceChart";
 import { useAssetDetailQuery } from "../hooks/useAssetDetailQuery";
