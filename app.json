@@ -38,7 +38,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/logo-argenBit.png",
+          "icon": "./assets/argenBit-notif.png",
           "color": "#236391",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false

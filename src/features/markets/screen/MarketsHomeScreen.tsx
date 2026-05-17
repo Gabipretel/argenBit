@@ -217,9 +217,7 @@ export function MarketsHomeScreen() {
     (query.isFetchingNextPage || showLoadMoreMinHold);
 
   const onEndReachedMarkets = useCallback(() => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      void query.fetchNextPage();
-    }
+    if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
   }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 
   if (query.isPending && !query.data) {
@@ -270,7 +268,7 @@ export function MarketsHomeScreen() {
             </Pressable>
           }
         />
-        <View style={styles.searchSticky}>
+        {/* <View style={styles.searchSticky}>
           <View style={styles.searchWrap}>
             <MaterialCommunityIcons name="magnify" size={22} color={colors.primary} style={styles.searchIcon} />
             <TextInput
@@ -283,16 +281,13 @@ export function MarketsHomeScreen() {
               autoCorrect={false}
             />
           </View>
-        </View>
+
+        </View> */}
         <View style={styles.centered}>
           <ErrorCallout
-            title="No pudimos cargar el mercado"
-            message={
-              env.coinstatsApiKey.trim()
-                ? "Reintentá en unos segundos. Si el problema sigue, comprobá tu conexión y la API key de CoinStats."
-                : "Falta EXPO_PUBLIC_COINSTATS_API_KEY en tu archivo .env. Agregala, reiniciá Expo (`pnpm start`) y reintentá."
-            }
-            onRetry={() => void query.refetch()}
+            title="Mercado no disponible"
+            message={"Por el momento no se encuentra disponible el mercado. Por favor, inténtelo más tarde."}
+            onRetry={() => query.refetch()}
           />
         </View>
       </SafeAreaView>
@@ -343,7 +338,7 @@ export function MarketsHomeScreen() {
           refreshControl={
             <RefreshControl
               refreshing={listRefreshing}
-              onRefresh={() => void query.refetch()}
+              onRefresh={() => query.refetch()}
               tintColor={colors.primary}
               colors={[colors.primary]}
             />

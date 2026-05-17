@@ -100,7 +100,7 @@ export function PriceChart({ data, isLoading, changePct24h }: Props) {
     return (
       <View style={[styles.box, styles.center]}>
         <Text style={[typography.bodyMd, styles.emptyTxt]}>
-          No hay suficientes datos para el gráfico.
+         Histórico no disponible. Por favor, inténtelo más tarde.
         </Text>
       </View>
     );

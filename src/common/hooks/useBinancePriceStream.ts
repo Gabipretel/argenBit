@@ -9,8 +9,8 @@ import { patchPriceInQueryCaches } from "@/ws/patchPriceCaches";
 const RECONNECT_MS = [1000, 2000, 4000, 8000, 16_000];
 
 /**
- * Precios spot vía `@miniTicker` (Binance público). No requiere API key.
- * `symbols`: bases en mayúsculas (`BTC`, `ETH`).
+ * Precios y variación 24 h (ventana rodante Binance) vía `@miniTicker` / `24hrMiniTicker`.
+ * No requiere API key. El % se deriva de `o`/`c` del ticker; alinea listado y detalle con el mismo stream.
  */
 export function useBinancePriceStream(symbols: string[], enabled = true) {
   const queryClient = useQueryClient();
@@ -77,7 +77,12 @@ export function useBinancePriceStream(symbols: string[], enabled = true) {
         if (typeof ev.data !== "string") return;
         const tick = parseBinanceMiniTicker(ev.data);
         if (!tick) return;
-        patchPriceInQueryCaches(queryClient, tick.fsym, tick.price);
+        patchPriceInQueryCaches(
+          queryClient,
+          tick.fsym,
+          tick.price,
+          tick.changePercent24Hr
+        );
       };
 
       ws.onclose = () => {

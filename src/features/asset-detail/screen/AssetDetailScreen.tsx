@@ -99,9 +99,9 @@ export function AssetDetailScreen() {
     return (
       <View style={styles.centered}>
         <ErrorCallout
-          title="No se pudo cargar"
-          message="No pudimos obtener el detalle de este activo. Reintentá o volvé atrás y elegí de nuevo."
-          onRetry={() => void detailQuery.refetch()}
+          title="Detalle del activo no disponible"
+          message="Por el momento no se encuentra disponible el detalle del activo. Por favor, inténtelo más tarde."
+          onRetry={() => detailQuery.refetch()}
         />
       </View>
     );
@@ -220,10 +220,6 @@ export function AssetDetailScreen() {
               ))}
             </ScrollView>
           </View>
-
-          {historyQuery.isError ? (
-            <Text style={[typography.bodyMd, styles.chartErr]}>Histórico no disponible.</Text>
-          ) : null}
 
           <PriceChart
             data={chartPoints}

@@ -73,9 +73,7 @@ export function NewsScreen() {
   );
 
   const onEndReachedNews = useCallback(() => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      void query.fetchNextPage();
-    }
+    if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
   }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 
   if (query.isError) {
@@ -84,13 +82,9 @@ export function NewsScreen() {
         <AppTopBar />
         <View style={styles.centered}>
           <ErrorCallout
-            title="No pudimos cargar noticias"
-            message={
-              env.coinstatsApiKey.trim()
-                ? "Reintentá en unos segundos. Si sigue fallando, comprobá tu conexión y la API key de CoinStats."
-                : "Falta EXPO_PUBLIC_COINSTATS_API_KEY en tu archivo .env. Agregala, reiniciá Expo y reintentá."
-            }
-            onRetry={() => void query.refetch()}
+            title="Noticias no disponibles"
+            message="Por el momento no se encuentran disponibles las noticias. Por favor, inténtelo más tarde."
+            onRetry={() => query.refetch()}
           />
         </View>
       </SafeAreaView>

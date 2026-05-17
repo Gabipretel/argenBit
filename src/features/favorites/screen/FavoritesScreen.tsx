@@ -243,7 +243,7 @@ export function FavoritesScreen() {
   };
 
   const onRefreshFavsAndSuggest = useCallback(() => {
-    void Promise.all([
+    Promise.all([
       suggestQuery.refetch(),
       fsyms.length > 0 ? query.refetch() : Promise.resolve(),
     ]);
@@ -338,9 +338,9 @@ export function FavoritesScreen() {
         <AppTopBar />
         <View style={styles.centered}>
           <ErrorCallout
-            title="No pudimos cargar precios"
-            message="Puede ser un fallo temporal de la red o del servicio. Reintentá en unos segundos."
-            onRetry={() => void query.refetch()}
+            title="Favoritos no disponibles"
+            message="Por el momento no se encuentran disponibles los favoritos. Por favor, inténtelo más tarde."
+            onRetry={() => query.refetch()}
           />
         </View>
       </SafeAreaView>

@@ -5,20 +5,17 @@ import { StyleSheet, View } from "react-native";
 import { ErrorCallout } from "./ui/ErrorCallout";
 import { colors, spacing } from "@/core/theme";
 
-const TITLE = "Algo salió mal";
-const MESSAGE = "Volvé a intentarlo más tarde.";
 
 export function AppErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   useEffect(() => {
     if (__DEV__) {
-      // Solo consola en desarrollo; nunca mostramos el detalle técnico en pantalla.
-      console.warn("[ErrorBoundary]", error);
+      console.warn("[Error detectado en la aplicación : ]", error);
     }
   }, [error]);
 
   return (
     <View style={styles.container}>
-      <ErrorCallout title={TITLE} message={MESSAGE} onRetry={resetErrorBoundary} />
+      <ErrorCallout title={"Algo salió mal"} message={"Volvé a intentarlo más tarde."} onRetry={resetErrorBoundary} />
     </View>
   );
 }

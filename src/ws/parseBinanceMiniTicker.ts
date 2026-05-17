@@ -1,12 +1,33 @@
 /**
- * Combined stream Binance: mensaje `{ stream, data }` donde `data` es JSON del evento `24hrMiniTicker`.
+ * Combined stream Binance: mensaje `{ stream, data }` con `24hrMiniTicker` o `24hrTicker`.
+ * Ventana 24 h rodante (Binance), no calendario UTC.
  */
-export function parseBinanceMiniTicker(raw: string): { fsym: string; price: number } | null {
+
+export type BinancePriceTick = {
+  fsym: string;
+  price: number;
+  /** Variación % en la ventana 24 h de Binance (mismo criterio que `o`/`c` o campo `P`). */
+  changePercent24Hr?: number;
+};
+
+function parseTickerNumber(v: unknown): number | null {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  const n = parseFloat(String(v ?? "").trim());
+  return Number.isFinite(n) ? n : null;
+}
+
+/** % desde precio de apertura de la ventana y último precio. */
+function changePercentFromOpenClose(open: number, close: number): number | null {
+  if (!(open > 0) || !Number.isFinite(close)) return null;
+  return ((close - open) / open) * 100;
+}
+
+export function parseBinanceMiniTicker(raw: string): BinancePriceTick | null {
   try {
     const outer = JSON.parse(raw) as unknown;
     if (!outer || typeof outer !== "object") return null;
-    const o = outer as Record<string, unknown>;
-    const innerRaw = o.data ?? o;
+    const outerObj = outer as Record<string, unknown>;
+    const innerRaw = outerObj.data ?? outerObj;
     const inner =
       typeof innerRaw === "string" ? (JSON.parse(innerRaw) as unknown) : innerRaw;
     if (!inner || typeof inner !== "object") return null;
@@ -16,11 +37,22 @@ export function parseBinanceMiniTicker(raw: string): { fsym: string; price: numb
     if (!pair.endsWith("USDT")) return null;
     const base = pair.slice(0, -4);
     if (!base) return null;
-    const c = row.c;
-    const price =
-      typeof c === "number" ? c : parseFloat(String(c ?? ""));
-    if (!Number.isFinite(price)) return null;
-    return { fsym: base, price };
+    const close = parseTickerNumber(row.c);
+    if (close === null) return null;
+
+    let changePercent24Hr: number | undefined;
+    const pPct = parseTickerNumber(row.P);
+    if (pPct !== null) {
+      changePercent24Hr = pPct;
+    } else {
+      const open = parseTickerNumber(row.o);
+      const derived = open !== null ? changePercentFromOpenClose(open, close) : null;
+      if (derived !== null) changePercent24Hr = derived;
+    }
+
+    const out: BinancePriceTick = { fsym: base, price: close };
+    if (changePercent24Hr !== undefined) out.changePercent24Hr = changePercent24Hr;
+    return out;
   } catch {
     return null;
   }
