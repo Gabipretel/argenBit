@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { AppState, Platform } from "react-native";
 
-import { runAllAlertsEvaluation } from "@/features/alerts";
+import { runAllAlertsEvaluation } from "@/features/alerts/runAlertEvaluation";
 import { shouldLoadExpoNotifications } from "@/core/config/expoRuntime";
 
 /**

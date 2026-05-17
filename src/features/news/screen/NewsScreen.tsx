@@ -24,7 +24,7 @@ import { colors, spacing, typography } from "@/core/theme";
 
 const MIN_SKELETON_UI_MS = 600;
 /** Mantiene el spinner del RefreshControl el tiempo mínimo (evita fallos al repetir el gesto en RN/FlashList). */
-const MIN_PULL_REFRESH_UI_MS = 480;
+const MIN_PULL_TO_REFRESH_SPINNER_MS = 480;
 
 type Nav = NativeStackNavigationProp<NewsStackParamList, "NewsHome">;
 
@@ -45,12 +45,15 @@ export function NewsScreen() {
    * - `refreshControl` debe estar memoizado: si se crea `<RefreshControl />` nuevo en cada render,
    *   FlashList recrea el control nativo y el pull deja de funcionar.
    */
-  const pullRefreshActive = manualPullRefresh || query.isRefetching;
-  const pullRefreshUi = useMinDurationActive(pullRefreshActive, MIN_PULL_REFRESH_UI_MS);
-  const showRefreshSkeleton = useMinDurationActive(pullRefreshActive, MIN_SKELETON_UI_MS);
+  const isPullToRefreshActive = manualPullRefresh || query.isRefetching;
+  const showPullRefreshSpinner = useMinDurationActive(
+    isPullToRefreshActive,
+    MIN_PULL_TO_REFRESH_SPINNER_MS
+  );
+  const showRefreshSkeleton = useMinDurationActive(isPullToRefreshActive, MIN_SKELETON_UI_MS);
   const showLoadMoreSkeleton = useMinDurationActive(query.isFetchingNextPage, MIN_SKELETON_UI_MS);
 
-  const onRefreshNews = useCallback(async () => {
+  const refreshNewsFeed = useCallback(async () => {
     setManualPullRefresh(true);
     try {
       await query.refetch();
@@ -59,20 +62,20 @@ export function NewsScreen() {
     }
   }, [query]);
 
-  const refreshControl = useMemo(
+  const newsListRefreshControl = useMemo(
     () => (
       <RefreshControl
-        refreshing={pullRefreshUi}
-        onRefresh={onRefreshNews}
+        refreshing={showPullRefreshSpinner}
+        onRefresh={refreshNewsFeed}
         tintColor={colors.primary}
         colors={[colors.primary]}
         progressViewOffset={Platform.OS === "android" ? 8 : undefined}
       />
     ),
-    [pullRefreshUi, onRefreshNews]
+    [showPullRefreshSpinner, refreshNewsFeed]
   );
 
-  const onEndReachedNews = useCallback(() => {
+  const loadMoreNewsArticles = useCallback(() => {
     if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
   }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 
@@ -125,7 +128,7 @@ export function NewsScreen() {
         ) : null}
         <FlashList
           style={styles.listFlex}
-          extraData={`${query.isFetchingNextPage}-${showLoadMoreSkeleton}-${articles.length}-${pullRefreshUi}`}
+          extraData={`${query.isFetchingNextPage}-${showLoadMoreSkeleton}-${articles.length}-${showPullRefreshSpinner}`}
           data={articles}
           renderItem={({ item }) => (
             <NewsRow
@@ -135,7 +138,7 @@ export function NewsScreen() {
           )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={[styles.listContent, styles.listContentGrow]}
-          refreshControl={refreshControl}
+          refreshControl={newsListRefreshControl}
           alwaysBounceVertical
           ListHeaderComponent={NewsListHeader}
           ListFooterComponent={
@@ -148,7 +151,7 @@ export function NewsScreen() {
               </View>
             ) : null
           }
-          onEndReached={onEndReachedNews}
+          onEndReached={loadMoreNewsArticles}
           onEndReachedThreshold={0.55}
         />
       </View>

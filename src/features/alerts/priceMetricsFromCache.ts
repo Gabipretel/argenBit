@@ -1,7 +1,7 @@
 import type { InfiniteData } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 
-import type { MarketsCoinsPage } from "@/features/markets";
+import type { MarketsCoinsPage } from "@/features/markets/hooks/useTopCoinsInfiniteQuery";
 import type { AssetDetail } from "@/domain/models/AssetDetail";
 import type { PriceMetrics } from "./alertConditions";
 import type { Asset } from "@/domain/models/Asset";

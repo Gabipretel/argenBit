@@ -8,10 +8,10 @@ export {
   NewsRowSkeletonList,
 } from "./components/NewsRowSkeleton";
 
+export { NEWS_PAGE_SIZE, newsInfiniteQueryKey } from "./newsQueryKeys";
+
 export {
   flattenNewsPages,
-  newsInfiniteQueryKey,
-  NEWS_PAGE_SIZE,
   useNewsInfiniteQuery,
 } from "./hooks/useNewsInfiniteQuery";
 

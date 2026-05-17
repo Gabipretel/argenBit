@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { NewsArticle } from "@/domain/models/NewsArticle";
@@ -23,7 +23,7 @@ function hueFromId(id: string): string {
   return `hsl(${hue}, 48%, 90%)`;
 }
 
-export function NewsRow({ article, onPress }: NewsRowProps) {
+export const NewsRow = memo(function NewsRow({ article, onPress }: NewsRowProps) {
   const whenShort = newsRelativeShort(article.publishedOn);
   const pill = useMemo(() => newsPillForArticle(article.id), [article.id]);
   const initials = useMemo(() => sourceInitials(article.source), [article.source]);
@@ -88,6 +88,19 @@ export function NewsRow({ article, onPress }: NewsRowProps) {
         </View>
       )}
     </Pressable>
+  );
+}, isSameNewsRowProps);
+
+function isSameNewsRowProps(previous: NewsRowProps, next: NewsRowProps): boolean {
+  const previousArticle = previous.article;
+  const nextArticle = next.article;
+  return (
+    previous.onPress === next.onPress &&
+    previousArticle.id === nextArticle.id &&
+    previousArticle.title === nextArticle.title &&
+    previousArticle.source === nextArticle.source &&
+    previousArticle.imageUrl === nextArticle.imageUrl &&
+    previousArticle.publishedOn === nextArticle.publishedOn
   );
 }
 

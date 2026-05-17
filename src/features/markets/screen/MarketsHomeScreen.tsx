@@ -18,13 +18,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  AppTopBar,
-  ErrorCallout,
-  useBinancePriceStream,
-  useDebouncedValue,
-  useMinDurationActive,
-} from "@/common";
+import { AppTopBar } from "@/common/components/layout/AppTopBar";
+import { ErrorCallout } from "@/common/components/ui/ErrorCallout";
+import { useBinancePriceStream } from "@/common/hooks/useBinancePriceStream";
+import { useDebouncedValue } from "@/common/hooks/useDebouncedValue";
+import { useMinDurationActive } from "@/common/hooks/useMinDurationActive";
 import { CryptoRow } from "../components/CryptoRow";
 import { CryptoRowSkeleton, CryptoRowSkeletonList } from "../components/CryptoRowSkeleton";
 import { MAX_BINANCE_STREAMS } from "@/core/config/binanceWs";
@@ -52,6 +50,8 @@ type Nav = CompositeNavigationProp<
 
 /** Mínimo visible para overlays / pie “cargar más” (caché de React Query suele ser muy rápida). */
 const MIN_SKELETON_UI_MS = 600;
+/** Mantiene el spinner del RefreshControl el tiempo mínimo (evita fallos al repetir el gesto en RN/FlashList). */
+const MIN_PULL_TO_REFRESH_SPINNER_MS = 480;
 
 function FilterTile({
   active,
@@ -206,9 +206,13 @@ export function MarketsHomeScreen() {
     dispatch(setMarketPreset(preset));
   };
 
-  const listRefreshing =
+  const isMarketListRefreshing =
     query.isFetching && !query.isPending && !query.isFetchingNextPage;
-  const showRefreshSkeleton = useMinDurationActive(listRefreshing, MIN_SKELETON_UI_MS);
+  const showPullRefreshSpinner = useMinDurationActive(
+    isMarketListRefreshing,
+    MIN_PULL_TO_REFRESH_SPINNER_MS
+  );
+  const showRefreshSkeleton = useMinDurationActive(isMarketListRefreshing, MIN_SKELETON_UI_MS);
   const showLoadMoreMinHold = useMinDurationActive(query.isFetchingNextPage, MIN_SKELETON_UI_MS);
   const showLoadMoreFooter =
     filtered.length > 0 &&
@@ -218,6 +222,22 @@ export function MarketsHomeScreen() {
   const onEndReachedMarkets = useCallback(() => {
     if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
   }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
+
+  const refreshMarketList = useCallback(() => {
+    void query.refetch();
+  }, [query]);
+
+  const marketListRefreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={showPullRefreshSpinner}
+        onRefresh={refreshMarketList}
+        tintColor={colors.primary}
+        colors={[colors.primary]}
+      />
+    ),
+    [showPullRefreshSpinner, refreshMarketList]
+  );
 
   if (query.isPending && !query.data) {
     return (
@@ -334,14 +354,7 @@ export function MarketsHomeScreen() {
           )}
           keyExtractor={(item) => item.fsym}
           contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={listRefreshing}
-              onRefresh={() => query.refetch()}
-              tintColor={colors.primary}
-              colors={[colors.primary]}
-            />
-          }
+          refreshControl={marketListRefreshControl}
           onEndReached={onEndReachedMarkets}
           onEndReachedThreshold={0.55}
           ListHeaderComponent={

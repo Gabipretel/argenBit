@@ -3,10 +3,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { mapNewsFeedItem } from "@/core/api/mappers/mapNewsFeedItem";
 import { fetchNewsPage } from "@/core/api/repositories/newsRepository";
 import type { NewsArticle } from "@/domain/models/NewsArticle";
+import { NEWS_PAGE_SIZE, newsInfiniteQueryKey } from "../newsQueryKeys";
 
-export const NEWS_PAGE_SIZE = 15;
-
-export const newsInfiniteQueryKey = ["news", { limit: NEWS_PAGE_SIZE }] as const;
+export { NEWS_PAGE_SIZE, newsInfiniteQueryKey } from "../newsQueryKeys";
 
 async function fetchPage(page: number): Promise<NewsArticle[]> {
   const dto = await fetchNewsPage(page, NEWS_PAGE_SIZE);

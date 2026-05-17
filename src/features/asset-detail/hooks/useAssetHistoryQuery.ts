@@ -4,7 +4,6 @@ import { fetchCoinChart } from "@/core/api/repositories/coinsRepository";
 import type { HistoryRangeId, PriceHistoryPoint } from "@/domain/models/AssetDetail";
 
 const RANGE_TO_PERIOD: Record<HistoryRangeId, string> = {
-  "1h": "24h",
   "24h": "24h",
   "7d": "1w",
   "6m": "6m",

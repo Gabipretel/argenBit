@@ -19,4 +19,4 @@ export interface PriceHistoryPoint {
   timeSec: number;
 }
 
-export type HistoryRangeId = "1h" | "24h" | "7d" | "6m" | "1y" | "all";
+export type HistoryRangeId = "24h" | "7d" | "6m" | "1y" | "all";

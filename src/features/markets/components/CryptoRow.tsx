@@ -6,7 +6,8 @@ import { AnimatedUsdPrice } from "./AnimatedUsdPrice";
 import { MiniSparkline, type SparkTone } from "./MiniSparkline";
 import type { Asset } from "@/domain/models/Asset";
 import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
-import { buildSparkSeries, formatUsd } from "@/common";
+import { formatUsd } from "@/common/utils/formatters";
+import { buildSparkSeries } from "@/common/utils/sparkSeries";
 
 const THUMB_SIZE = 44;
 

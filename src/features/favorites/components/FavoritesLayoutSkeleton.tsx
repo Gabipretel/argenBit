@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { CryptoRowSkeleton } from "@/features/markets";
+import { CryptoRowSkeleton } from "@/features/markets/components/CryptoRowSkeleton";
 import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
 
 const SUGGEST_CARD_W = 200;

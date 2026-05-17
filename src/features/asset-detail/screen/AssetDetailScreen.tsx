@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
 import type { ComponentProps } from "react";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -13,16 +13,17 @@ import {
 } from "react-native";
 import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 
+import { ErrorCallout } from "@/common/components/ui/ErrorCallout";
+import { useBinancePriceStream } from "@/common/hooks/useBinancePriceStream";
+import { useMinDurationActive } from "@/common/hooks/useMinDurationActive";
 import {
-  ErrorCallout,
   formatCompactNumber,
   formatSupply,
   formatUsd,
-  useBinancePriceStream,
-  useMinDurationActive,
-} from "@/common";
-import { AnimatedUsdPrice, CryptoRowSkeletonList } from "@/features/markets";
-import { useFavorites } from "@/features/favorites";
+} from "@/common/utils/formatters";
+import { AnimatedUsdPrice } from "@/features/markets/components/AnimatedUsdPrice";
+import { CryptoRowSkeletonList } from "@/features/markets/components/CryptoRowSkeleton";
+import { useFavorites } from "@/features/favorites/FavoritesContext";
 import { AssetDetailSkeleton } from "../components/AssetDetailSkeleton";
 import { PriceChart } from "../components/PriceChart";
 import { useAssetDetailQuery } from "../hooks/useAssetDetailQuery";
@@ -38,7 +39,6 @@ interface AssetDetailRouteParams {
 }
 
 const RANGE_OPTIONS: { id: HistoryRangeId; label: string }[] = [
-  { id: "1h", label: "1 h" },
   { id: "24h", label: "24 h" },
   { id: "7d", label: "7 d" },
   { id: "6m", label: "6 m" },
@@ -83,17 +83,30 @@ export function AssetDetailScreen() {
     });
   }, [navigation, fsym, coinId, displayName, fav, toggle]);
 
-  const onRefresh = useCallback(() => {
+  const refreshAssetDetail = useCallback(() => {
     void Promise.all([detailQuery.refetch(), historyQuery.refetch()]);
   }, [detailQuery, historyQuery]);
 
   /** No mezclar el primer fetch del histórico con el spinner de pull (evita parpadeos y “no aparece”). */
-  const chartsInitialLoad = historyQuery.isPending && chartPoints.length === 0;
-  const refreshingRaw =
+  const isChartLoadingInitially = historyQuery.isPending && chartPoints.length === 0;
+  const isDetailRefreshing =
     Boolean(detailQuery.data) &&
-    !chartsInitialLoad &&
+    !isChartLoadingInitially &&
     (detailQuery.isFetching || historyQuery.isFetching);
-  const refreshingUi = useMinDurationActive(refreshingRaw, 550);
+  const showPullRefreshSpinner = useMinDurationActive(isDetailRefreshing, 550);
+
+  const detailRefreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={showPullRefreshSpinner}
+        onRefresh={refreshAssetDetail}
+        tintColor={colors.primary}
+        colors={[colors.primary]}
+        progressViewOffset={Platform.OS === "android" ? 8 : undefined}
+      />
+    ),
+    [showPullRefreshSpinner, refreshAssetDetail]
+  );
 
   if (detailQuery.isError) {
     return (
@@ -122,7 +135,7 @@ export function AssetDetailScreen() {
   return (
     <View style={styles.pageRoot}>
       <View style={styles.detailShell}>
-        {refreshingUi ? (
+        {showPullRefreshSpinner ? (
           <View style={styles.refreshOverlay} pointerEvents="auto">
             <CryptoRowSkeletonList count={4} />
             <View style={styles.refreshChartPh} />
@@ -134,15 +147,7 @@ export function AssetDetailScreen() {
           contentContainerStyle={styles.scrollContent}
           nestedScrollEnabled
           {...(Platform.OS === "android" ? { overScrollMode: "always" as const } : {})}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshingUi}
-              onRefresh={onRefresh}
-              tintColor={colors.primary}
-              colors={[colors.primary]}
-              progressViewOffset={Platform.OS === "android" ? 8 : undefined}
-            />
-          }
+          refreshControl={detailRefreshControl}
         >
           <View style={styles.heroCard}>
             <View style={styles.heroRow}>

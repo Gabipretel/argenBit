@@ -1,4 +1,4 @@
-import { isAlertConditionMet } from "@/features/alerts";
+import { isAlertConditionMet } from "@/features/alerts/alertConditions";
 
 describe("isAlertConditionMet", () => {
   const base = { priceUsd: 50_000, changePercent24Hr: 2.5 };
