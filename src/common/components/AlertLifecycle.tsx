@@ -5,10 +5,7 @@ import { AppState, Platform } from "react-native";
 import { runAllAlertsEvaluation } from "@/features/alerts/runAlertEvaluation";
 import { shouldLoadExpoNotifications } from "@/core/config/expoRuntime";
 
-/**
- * §7.7 — al volver a foreground se reevalúan reglas contra la caché actual.
- * `expo-notifications` no se importa en Expo Go (SDK 53+ Android): usa development build para push/locales ahí.
- */
+
 export function AlertLifecycle() {
   const queryClient = useQueryClient();
 

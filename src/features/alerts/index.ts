@@ -1,5 +1,3 @@
-/** Entrada pública del módulo Alertas — importar desde `@/features/alerts`. */
-
 export { isAlertConditionMet } from "./alertConditions";
 export type { PriceMetrics } from "./alertConditions";
 

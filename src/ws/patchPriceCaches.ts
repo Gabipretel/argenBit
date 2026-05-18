@@ -8,10 +8,6 @@ import { ensureAssetDetail } from "@/core/api/mappers/mapCoinToAssetDetail";
 import type { AssetDetail } from "@/domain/models/AssetDetail";
 import type { MarketsCoinsPage } from "@/features/markets/hooks/useTopCoinsInfiniteQuery";
 
-/**
- * Actualiza precio (y opcionalmente variación 24 h) en infinite top + detalle + favoritos.
- * `changePercent24Hr` viene del stream Binance (ventana 24 h rodante); si se omite, no se toca el % de CoinStats.
- */
 export function patchPriceInQueryCaches(
   queryClient: QueryClient,
   fsymUpper: string,

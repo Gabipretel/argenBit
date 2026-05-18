@@ -42,7 +42,6 @@ function formatUsd(n: number): string {
   }).format(n);
 }
 
-/** Título y cuerpo legibles para la notificación local (sin símbolos ≤ / ≥). */
 export function buildAlertNotificationContent(
   alert: StoredAlert,
   metrics: PriceMetrics
@@ -78,10 +77,6 @@ export function buildAlertNotificationContent(
   }
 }
 
-/**
- * Notificación local casi inmediata — §7.7 (opcional).
- * En Expo Go no hay módulo nativo: no hace nada.
- */
 export async function presentAlertTriggeredNotification(
   alert: StoredAlert,
   metrics: PriceMetrics
@@ -111,7 +106,6 @@ export async function presentAlertTriggeredNotification(
   }
 }
 
-/** Dev build con módulo nativo — verificar que llega una notificación local. */
 export async function scheduleTestLocalNotification(): Promise<boolean> {
   if (Platform.OS === "web") return false;
   const Notifications = await loadNotifications();

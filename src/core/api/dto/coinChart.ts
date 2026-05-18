@@ -1,4 +1,4 @@
-
+/** Respuesta de la API `GET /coins/charts` (CoinStats). */
 export type CoinChartPointDto = [number, number, number, number];
 
 export type CoinChartPeriod =

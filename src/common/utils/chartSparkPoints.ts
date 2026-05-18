@@ -1,9 +1,10 @@
-import type { CoinChartPeriod, CoinChartPointDto } from "@/core/api/dto/coinChart";
+import type { CoinChartPointDto } from "@/core/api/dto/coinChart";
 
 const MAX_SPARK_POINTS = 32;
 
 /**
- * Normaliza precios USD del chart CoinStats a serie 0–1 para `MiniSparkline`.
+ * Convierte el histórico de precios de CoinStats en (a) una mini curva normalizada para pintar
+ * y (b) un % de cambio inicio→fin del periodo. 
  */
 export function chartUsdToSparkPoints(
   chart: CoinChartPointDto[],

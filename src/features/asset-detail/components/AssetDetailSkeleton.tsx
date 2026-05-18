@@ -13,7 +13,6 @@ function Ph({ style, shimmer }: { style: object; shimmer: object }) {
   return <Animated.View style={[styles.ph, style, shimmer]} />;
 }
 
-/** Placeholder del detalle de activo mientras carga la primera respuesta. */
 export function AssetDetailSkeleton() {
   const pulse = useSharedValue(0.45);
 

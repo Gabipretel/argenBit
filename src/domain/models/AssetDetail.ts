@@ -1,4 +1,4 @@
-/** Snapshot detalle — CoinStats `GET /coins/{coinId}` */
+/** CoinStats `GET /coins/{coinId}` */
 export interface AssetDetail {
   coinId: string;
   fsym: string;

@@ -34,7 +34,6 @@ function Ph({
   return <Animated.View style={[styles.phBase, style, shimmer]} />;
 }
 
-/** Misma jerarquía que la pantalla vacía: título, hero, sugerencias horizontales, tips. */
 export function FavoritesEmptyStateSkeleton() {
   const shimmer = useShimmerStyle();
   return (
@@ -112,7 +111,6 @@ export function FavoritesListInitialSkeleton({ rowCount, showFooter = true }: Li
   );
 }
 
-/** Solo sugerencias + tips (para componer encima de filas). */
 export function FavoritesFooterOnlySkeleton() {
   const shimmer = useShimmerStyle();
   return (

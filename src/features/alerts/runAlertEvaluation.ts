@@ -7,13 +7,11 @@ import { getPriceMetricsFromCache } from "./priceMetricsFromCache";
 import type { StoredAlert } from "@/storage/alertsStorage";
 import { readAlerts, writeAlerts } from "@/storage/alertsStorage";
 
-/** Por id — si la condición ya estaba cumplida en la corrida anterior (evita spam). */
 const lastConditionSatisfied = new Map<string, boolean>();
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 const pendingFsyms = new Set<string>();
 
-/** Evita carreras entre `runAllAlertsEvaluation` y ticks del WS que pisan el mapa de bordes. */
 let evaluationTail: Promise<void> = Promise.resolve();
 
 function queueAlertEvaluation(
@@ -94,7 +92,6 @@ async function runAlertEvaluation(
   }
 }
 
-/** Rearma el borde para que la próxima evaluación pueda disparar de nuevo. */
 export function resetAlertEdgeState(alertId: string): void {
   lastConditionSatisfied.delete(alertId);
 }

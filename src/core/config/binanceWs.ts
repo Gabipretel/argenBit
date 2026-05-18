@@ -1,4 +1,4 @@
-/** Máximo de streams `@miniTicker` en una URL combined (evitar URLs enormes). */
+/** Máximo de streams  */
 export const MAX_BINANCE_STREAMS = 80;
 
 const BINANCE_COMBINED = "wss://data-stream.binance.vision/stream";

@@ -11,13 +11,10 @@ interface Props {
   priceUsd: number;
   format: (n: number) => string;
   textStyle: StyleProp<TextStyle>;
-  /** Alineación del “pill” del precio (lista: end, detalle: start). */
   align?: "start" | "end";
 }
 
-/**
- * Flash verde/rojo solo sobre el precio cuando cambia (WS / refetch).
- */
+/** Flash verde/rojo solo sobre el precio cuando cambia. */
 export function AnimatedUsdPrice({ priceUsd, format, textStyle, align = "start" }: Props) {
   const prevRef = useRef<number | undefined>(undefined);
   const flash = useSharedValue(0);

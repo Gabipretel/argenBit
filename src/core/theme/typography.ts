@@ -3,9 +3,7 @@ import type { TextStyle } from "react-native";
 import { colors } from "@/core/theme/colors";
 
 /**
- * Familias cargadas en useAppFonts — claves = fontFamily en RN.
- * Si la carga falla, usamos sistema + fontWeight (evita texto invisible).
- * §15.2
+ * fontFamilies cargadas en useAppFonts 
  */
 export const fontFamilies = {
   displayBold: "HankenGrotesk_700Bold",
@@ -18,7 +16,6 @@ export const fontFamilies = {
 
 let brandFontsActive = false;
 
-/** Llamar desde App cuando las fuentes ya resolvieron (éxito o error). */
 export function setBrandTypographyActive(value: boolean) {
   brandFontsActive = value;
 }
@@ -27,7 +24,6 @@ function fam(key: keyof typeof fontFamilies): string | undefined {
   return brandFontsActive ? fontFamilies[key] : undefined;
 }
 
-/** Peso fallback cuando no hay fuente custom (misma jerarquía visual aproximada). */
 function fw(weight: TextStyle["fontWeight"]): Pick<TextStyle, "fontWeight"> {
   return brandFontsActive ? {} : { fontWeight: weight };
 }

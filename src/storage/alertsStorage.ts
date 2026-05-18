@@ -8,7 +8,6 @@ export type AlertKind =
   | "pct_up"
   | "pct_down";
 
-/** `active` vigila precios; `notified` ya disparó y espera reactivación manual. */
 export type AlertStatus = "active" | "notified";
 
 export interface StoredAlert {

@@ -4,7 +4,6 @@ type ScrollableList = {
   scrollToEnd: (options?: { animated?: boolean }) => void;
 };
 
-/** Al paginar, desplaza la lista al footer para que el loader “cargando más” quede visible. */
 export function useScrollListToEndOnLoadMore(
   listRef: RefObject<ScrollableList | null>,
   isLoadingMore: boolean

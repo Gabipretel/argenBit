@@ -1,4 +1,4 @@
-/** Baseline 4px · §15.3 */
+
 export const spacing = {
   xs: 4,
   sm: 8,

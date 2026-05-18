@@ -1,5 +1,5 @@
 /**
- * Interpreta números con coma o punto (es-AR / en-US) para umbrales en formularios.
+ * Interpreta números con coma o punto (es-AR / en-US) para datos numéricos en formularios.
  */
 export function parseLocaleNumber(raw: string): number | null {
   const t = raw.trim().replace(/\s/g, "");

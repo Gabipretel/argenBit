@@ -1,4 +1,3 @@
-/** Entrada pública del módulo Mercados — importar desde `@/features/markets`. */
 
 export { AnimatedUsdPrice } from "./components/AnimatedUsdPrice";
 export { CryptoRow } from "./components/CryptoRow";

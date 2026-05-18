@@ -15,7 +15,6 @@ export const ALERT_ICON_NAME: Record<AlertKind, string> = {
   pct_down: "chart-line-variant",
 };
 
-/** Opciones del modal «Nueva alerta». */
 export const ALERT_KIND_OPTIONS: {
   kind: AlertKind;
   title: string;

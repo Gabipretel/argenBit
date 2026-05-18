@@ -1,12 +1,8 @@
-/**
- * Combined stream Binance: mensaje `{ stream, data }` con `24hrMiniTicker` o `24hrTicker`.
- * Ventana 24 h rodante (Binance), no calendario UTC.
- */
 
 export type BinancePriceTick = {
   fsym: string;
   price: number;
-  /** Variación % en la ventana 24 h de Binance (mismo criterio que `o`/`c` o campo `P`). */
+  /** Variación % en la ventana 24 h de Binance. */
   changePercent24Hr?: number;
 };
 

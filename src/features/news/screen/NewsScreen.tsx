@@ -47,13 +47,6 @@ export function NewsScreen() {
     [query.data?.pages]
   );
 
-  /**
-   * - `isRefetching` excluye `fetchNextPage` (no confundir pull con “cargar más”).
-   * - `manualPullRefresh`: el gesto dispara `onRefresh` antes de que TanStack marque `isRefetching`
-   *   (y evita depender solo de flags si hay un frame de retraso).
-   * - `refreshControl` debe estar memoizado: si se crea `<RefreshControl />` nuevo en cada render,
-   *   FlashList recrea el control nativo y el pull deja de funcionar.
-   */
   const isPullToRefreshActive = manualPullRefresh || query.isRefetching;
   const showPullRefreshSpinner = useMinDurationActive(
     isPullToRefreshActive,

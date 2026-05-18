@@ -1,6 +1,4 @@
-/**
- * Tokens §15.1 — argenBit Light & Professional
- */
+
 export const colors = {
   background: "#f9f9fc",
   surface: "#f9f9fc",
@@ -27,7 +25,6 @@ export const colors = {
   success: "#059669",
   primaryFixed: "#cee5ff",
   onPrimaryFixed: "#001d32",
-  /** Tabs inferiores — dorado apagado (marca, menos “neón” que amarillo puro). */
   tabBarActive: "#A67C00",
 } as const;
 

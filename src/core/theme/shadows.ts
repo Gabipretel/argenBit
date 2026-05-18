@@ -1,6 +1,5 @@
 import { Platform, type ViewStyle } from "react-native";
 
-/** Tarjetas y campos elevados (listas, buscador, paneles). */
 export const cardShadow: ViewStyle = Platform.select({
   ios: {
     shadowColor: "#000",
@@ -12,7 +11,6 @@ export const cardShadow: ViewStyle = Platform.select({
   default: {},
 });
 
-/** Diálogos y superficies elevadas. */
 export const modalShadow: ViewStyle = Platform.select({
   ios: {
     shadowColor: "#000",
@@ -24,5 +22,4 @@ export const modalShadow: ViewStyle = Platform.select({
   default: {},
 });
 
-/** Misma lógica que `cardShadow` (panel filtros Mercados). */
 export const toolbarPanelShadow: ViewStyle = cardShadow;

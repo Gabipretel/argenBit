@@ -7,7 +7,7 @@ function mapPct(value: unknown): number {
 
 type LegacyAssetDetail = AssetDetail & { changePercent24Hr?: number };
 
-/** Normaliza detalle en caché (campos `priceChange*` o legado `changePercent24Hr`). */
+/** Normaliza detalle en caché (campos `priceChange*` o  `changePercent24Hr`). */
 export function ensureAssetDetail(detail: LegacyAssetDetail): AssetDetail {
   const legacy24 = detail.changePercent24Hr;
   return {

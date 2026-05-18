@@ -4,9 +4,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { shouldLoadExpoNotifications } from "@/core/config/expoRuntime";
 import { colors, radii, spacing, toolbarPanelShadow, typography } from "@/core/theme";
 
-/**
- * En Expo Go (Android SDK 53+) no hay módulo nativo de notificaciones.
- */
 export function ExpoNotificationsHintBanner() {
   if (shouldLoadExpoNotifications()) return null;
 

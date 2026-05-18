@@ -1,6 +1,6 @@
 import type { Asset } from "@/domain/models/Asset";
 
-/** Params de `AssetDetail` (scores vienen del listado `GET /coins?includeRiskScore=true`). */
+/** Params de `AssetDetail`  */
 export type AssetDetailParams = {
   fsym: string;
   coinId: string;

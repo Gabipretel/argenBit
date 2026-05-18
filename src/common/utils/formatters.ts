@@ -12,7 +12,7 @@ export function formatCompactNumber(n: number): string {
     notation: "compact",
     compactDisplay: "short",
     maximumFractionDigits: 2,
-  }).format(n);
+  }).format(n); 
 }
 
 export function formatSupply(n: number): string {

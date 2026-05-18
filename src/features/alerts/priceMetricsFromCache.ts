@@ -24,9 +24,6 @@ function metricsFromTopPages(
   return null;
 }
 
-/**
- * Snapshot para evaluar alertas: prioriza detalle, luego cualquier lista top en caché, luego favoritos.
- */
 export function getPriceMetricsFromCache(
   queryClient: QueryClient,
   fsymUpper: string

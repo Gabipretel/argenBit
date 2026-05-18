@@ -64,9 +64,7 @@ type Nav = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList>
 >;
 
-/** Mínimo visible para overlays / pie “cargar más” (caché de React Query suele ser muy rápida). */
 const MIN_SKELETON_UI_MS = 600;
-/** Mantiene el spinner del RefreshControl el tiempo mínimo (evita fallos al repetir el gesto en RN/FlashList). */
 const MIN_PULL_TO_REFRESH_SPINNER_MS = 480;
 
 function FilterTile({
@@ -358,21 +356,6 @@ export function MarketsHomeScreen() {
             </Pressable>
           }
         />
-        {/* <View style={styles.searchSticky}>
-          <View style={styles.searchWrap}>
-            <MaterialCommunityIcons name="magnify" size={22} color={colors.primary} style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar por nombre o símbolo"
-              placeholderTextColor={colors.onSurfaceVariant}
-              value={searchLocal}
-              onChangeText={setSearchLocal}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-        </View> */}
         <View style={styles.centered}>
           <ErrorCallout
             title="Mercado no disponible"

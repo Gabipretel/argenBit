@@ -1,14 +1,10 @@
-/** Título + cuerpo del aviso cuando la búsqueda en Mercados no devuelve filas. */
+
 export type MarketsEmptySearchCopy = {
   title: string;
   bodyWithQuery: (query: string) => string;
   bodyFallback: string;
 };
 
-/**
- * Variantes de copy (tono cordial, español AR).
- * Cambiá `MARKETS_EMPTY_SEARCH_COPY_INDEX` (0–4) para usar otra en la app.
- */
 export const MARKETS_EMPTY_SEARCH_COPY_VARIANTS: MarketsEmptySearchCopy[] = [
   {
     title: "No lo encontramos",
@@ -37,7 +33,6 @@ export const MARKETS_EMPTY_SEARCH_COPY_VARIANTS: MarketsEmptySearchCopy[] = [
   },
 ];
 
-/** Índice activo en `MARKETS_EMPTY_SEARCH_COPY_VARIANTS`. */
 export const MARKETS_EMPTY_SEARCH_COPY_INDEX = 4;
 
 export function marketsEmptySearchCopy(): MarketsEmptySearchCopy {

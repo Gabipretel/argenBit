@@ -9,7 +9,6 @@ function finiteNumber(value: unknown, fallback = 0): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
-/** Normaliza filas en caché React Query (p. ej. antes de `priceChange1h`). */
 export function ensureAsset(asset: Asset): Asset {
   return {
     ...asset,

@@ -4,7 +4,7 @@ import { chartUsdToSparkPoints } from "@/common/utils/chartSparkPoints";
 import { DEFAULT_COIN_CHART_PERIOD } from "@/core/config/coinChartPeriods";
 import { fetchCoinsCharts } from "@/core/api/repositories/chartsRepository";
 
-/** Máximo de monedas por request batch (coste API × coinIds). */
+/** Máximo de monedas por request. */
 export const MARKETS_CHART_BATCH_SIZE = 12;
 
 /** Mismo periodo que el gráfico por defecto en detalle de activo. */
@@ -30,7 +30,7 @@ async function fetchMarketsSparkCharts(
 }
 
 /**
- * Sparklines (mismo periodo que detalle por defecto) en Mercados (`GET /coins/charts`).
+ * Sparklines (mismo periodo que el gráfico por defecto en detalle de activo) en Mercados (`GET /coins/charts`).
  */
 export function useMarketsSparkChartsQuery(coinIds: string[], enabled = true) {
   const ids = [...new Set(coinIds.map((c) => c.trim()).filter(Boolean))].slice(

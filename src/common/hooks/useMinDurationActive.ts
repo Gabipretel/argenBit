@@ -1,9 +1,10 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
 /**
- * Mantiene la señal en `true` al menos `minMs` desde que `active` pasó a `true`,
- * aunque `active` vuelva a `false` antes (p. ej. respuesta desde caché muy rápida).
+ * Garantiza que un indicador de carga se muestre al menos `minMs`,
+ * aunque `active` se apague antes (p. ej. datos desde caché).
  */
+
 export function useMinDurationActive(active: boolean, minMs: number): boolean {
   const [out, setOut] = useState(false);
   const sessionStartRef = useRef<number | null>(null);

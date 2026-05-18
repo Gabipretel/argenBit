@@ -5,10 +5,6 @@ export interface PriceMetrics {
   changePercent24Hr: number;
 }
 
-/**
- * §7.7 — comparar precio actual y variación 24h del snapshot en caché con la regla.
- * `pct_down`: umbral positivo en UI → compara contra variación ≤ −threshold.
- */
 export function isAlertConditionMet(
   alert: Pick<StoredAlert, "kind" | "threshold">,
   metrics: PriceMetrics

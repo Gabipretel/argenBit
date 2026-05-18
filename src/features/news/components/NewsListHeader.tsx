@@ -4,7 +4,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { colors, radii, spacing, toolbarPanelShadow, typography } from "@/core/theme";
 
 type NewsListHeaderProps = {
-  /** Si es false (p. ej. skeleton de carga), solo se muestra el título; el panel aparece al terminar de cargar. */
   showChipPanel?: boolean;
 };
 

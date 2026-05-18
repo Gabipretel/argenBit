@@ -14,7 +14,6 @@ const THUMB_SIZE = 44;
 interface Props {
   asset: Asset;
   onPress: () => void;
-  /** Serie 0–1 desde CoinStats `/coins/charts`; si falta, fallback decorativo. */
   chartSparkPoints?: number[] | null;
 }
 

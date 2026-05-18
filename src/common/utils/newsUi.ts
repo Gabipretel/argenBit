@@ -9,7 +9,6 @@ function hashStr(s: string): number {
   return h;
 }
 
-/** Etiqueta decorativa en la fila: el feed no trae categoría editorial, se asigna por hash del id. */
 export type NewsPillStyle = { label: string; bg: string; fg: string };
 
 const PILL_PRESETS: NewsPillStyle[] = [
@@ -33,7 +32,7 @@ export function sourceInitials(source: string): string {
   return t.slice(0, 2).toUpperCase();
 }
 
-/** Tiempo relativo corto en español (sin plugin dayjs). */
+/** Tiempo desde publicación en formato corto */
 export function newsRelativeShort(publishedOn: number): string {
   const now = Math.floor(Date.now() / 1000);
   const diff = Math.max(0, now - publishedOn);

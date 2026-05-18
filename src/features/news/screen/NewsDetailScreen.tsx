@@ -31,7 +31,7 @@ type Props = NativeStackScreenProps<NewsStackParamList, "NewsDetail">;
 const MAX_PREVIEW_PARAGRAPHS = 5;
 const MAX_PREVIEW_CHARS = 1_700;
 
-/** Respeta saltos de párrafo del HTML; si queda un solo bloque, parte en bloques de lectura. */
+/** Respeta saltos de párrafo del HTML. Si queda un solo bloque, parte en bloques de lectura. */
 function paragraphsFromHtml(html: string): string[] {
   const loosened = html
     .replace(/<\/p\s*>/gi, "\n")

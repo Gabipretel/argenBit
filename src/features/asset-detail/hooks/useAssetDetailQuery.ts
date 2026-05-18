@@ -12,9 +12,6 @@ async function fetchDetail(coinId: string, fallbackName?: string): Promise<Asset
   return mapCoinToAssetDetail(dto, fallbackName);
 }
 
-/**
- * Detalle por `coinId` (CoinStats). Query key `['coin', fsym]` para compatibilidad con parches WS.
- */
 export function useAssetDetailQuery(
   fsym: string,
   coinId: string,

@@ -1,4 +1,4 @@
-/** Respuesta paginada `GET /coins` (CoinStats). */
+/** Respuesta de la API `GET /coins`, `GET /coins/:id` (CoinStats). */
 export interface CoinListPageMetaDto {
   page: number;
   limit: number;
@@ -23,14 +23,13 @@ export interface CoinListItemDto {
   priceChange1m?: number;
   availableSupply?: number;
   totalSupply?: number;
-  /** 0–100 con `includeRiskScore=true` en `GET /coins`. */
   riskScore?: number;
   volatilityScore?: number;
   liquidityScore?: number;
 }
 
 export interface CoinListResponseDto {
-  meta: CoinListPageMetaDto;
+  meta?: CoinListPageMetaDto;
   result: CoinListItemDto[];
 }
 

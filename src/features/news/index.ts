@@ -1,4 +1,3 @@
-/** Entrada pública del módulo Noticias — importar desde `@/features/news`. */
 
 export { NewsListHeader } from "./components/NewsListHeader";
 export { NewsRow } from "./components/NewsRow";

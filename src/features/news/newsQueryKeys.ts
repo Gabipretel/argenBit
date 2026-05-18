@@ -1,4 +1,4 @@
-/** Claves de React Query del feed de noticias (sin cargar pantallas del feature). */
+/** Claves de React Query del feed de noticias. */
 
 export const NEWS_PAGE_SIZE = 15;
 

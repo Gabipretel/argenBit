@@ -6,11 +6,11 @@ import { binanceMiniTickerUrl, MAX_BINANCE_STREAMS, toBinanceMiniStreamToken } f
 import { parseBinanceMiniTicker } from "@/ws/parseBinanceMiniTicker";
 import { patchPriceInQueryCaches } from "@/ws/patchPriceCaches";
 
-const RECONNECT_MS = [1000, 2000, 4000, 8000, 16_000];
+const RECONNECT_MS = [1000, 2000, 4000, 8000, 16000];
 
 /**
- * Precios y variación 24 h (ventana rodante Binance) vía `@miniTicker` / `24hrMiniTicker`.
- * No requiere API key. El % se deriva de `o`/`c` del ticker; alinea listado y detalle con el mismo stream.
+ * Precios y variación 24 h (Binance)
+ * El % sale de apertura/cierre del ticker; alinea listado y detalle con el mismo stream.
  */
 export function useBinancePriceStream(symbols: string[], enabled = true) {
   const queryClient = useQueryClient();

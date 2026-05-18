@@ -62,15 +62,3 @@ export async function writeFavoriteEntries(entries: FavoriteEntry[]): Promise<vo
   await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...unique.values()]));
 }
 
-/** @deprecated usar readFavoriteEntries */
-export async function readFavoriteFsyms(): Promise<string[]> {
-  const rows = await readFavoriteEntries();
-  return rows.map((r) => r.fsym);
-}
-
-/** @deprecated usar writeFavoriteEntries */
-export async function writeFavoriteFsyms(fsyms: string[]): Promise<void> {
-  await writeFavoriteEntries(
-    fsyms.map((s) => ({ fsym: s.trim().toUpperCase(), coinId: s.trim().toLowerCase() }))
-  );
-}
