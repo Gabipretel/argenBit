@@ -5,7 +5,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNetworkStatus } from "@/common/hooks/useNetworkStatus";
 import { colors, spacing, typography } from "@/core/theme";
 
-/** Alto del contenido del banner (sin contar safe area superior). */
 export const OFFLINE_BANNER_CONTENT_HEIGHT = 56;
 
 export function useOfflineBannerInset(): number {
@@ -14,7 +13,7 @@ export function useOfflineBannerInset(): number {
 }
 
 /**
- * Banner global sin conexión: overlay bajo la status bar, no empuja el navigator.
+ * Banner global sin conexión
  * Las pantallas con `AppTopBar` usan `useOfflineBannerInset()` para dejar espacio.
  */
 export function OfflineBanner() {

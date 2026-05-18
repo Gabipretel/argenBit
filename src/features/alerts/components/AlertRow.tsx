@@ -14,15 +14,27 @@ import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
 interface AlertRowProps {
   alert: StoredAlert;
   onRemovePress: (alertId: string) => void;
+  onReactivatePress: (alertId: string) => void;
 }
 
-export const AlertRow = memo(function AlertRow({ alert, onRemovePress }: AlertRowProps) {
+export const AlertRow = memo(function AlertRow({
+  alert,
+  onRemovePress,
+  onReactivatePress,
+}: AlertRowProps) {
   const accentColor = ALERT_ACCENT_COLOR[alert.kind];
   const isPercentAlert = alert.kind === "pct_up" || alert.kind === "pct_down";
+  const isNotified = alert.status === "notified";
 
   return (
-    <View style={styles.alertCard}>
-      <View style={[styles.alertAccentTop, { backgroundColor: accentColor }]} />
+    <View style={[styles.alertCard, isNotified && styles.alertCardNotified]}>
+      <View
+        style={[
+          styles.alertAccentTop,
+          { backgroundColor: accentColor },
+          isNotified && styles.alertAccentMuted,
+        ]}
+      />
       <View style={styles.alertCardInner}>
         <View style={[styles.alertIconWrap, { borderColor: accentColor }]}>
           <MaterialCommunityIcons
@@ -44,33 +56,36 @@ export const AlertRow = memo(function AlertRow({ alert, onRemovePress }: AlertRo
             </Pressable>
           </View>
           <Text style={[styles.alertKind, { color: accentColor }]}>{getAlertKindTitle(alert.kind)}</Text>
-          <Text style={styles.alertCond}>
+          <Text style={[styles.alertCond, isNotified && styles.alertCondMuted]}>
             {ALERT_KIND_CARD_SUMMARY[alert.kind]}{" "}
             <Text style={styles.alertCondStrong}>
               {alert.threshold}
               {isPercentAlert ? "%" : " USD"}
             </Text>
           </Text>
-          <View
-            style={[
-              styles.alertRecChip,
-              alert.recurring ? styles.alertRecChipRecurring : styles.alertRecChipOnce,
-            ]}
-          >
-            <MaterialCommunityIcons
-              name={alert.recurring ? "repeat" : "numeric-1-circle-outline"}
-              size={14}
-              color={alert.recurring ? colors.primary : colors.secondary}
-            />
-            <Text
-              style={[
-                styles.alertRecTxt,
-                alert.recurring ? styles.alertRecTxtRecurring : styles.alertRecTxtOnce,
-              ]}
-            >
-              {alert.recurring ? "Cada vez" : "Una vez"}
-            </Text>
-          </View>
+          {isNotified ? (
+            <View style={styles.alertFooter}>
+              <View style={styles.notifiedChip}>
+                <MaterialCommunityIcons
+                  name="bell-check-outline"
+                  size={14}
+                  color={colors.secondary}
+                />
+                <Text style={styles.notifiedChipTxt}>Notificada</Text>
+              </View>
+              <Pressable
+                onPress={() => onReactivatePress(alert.id)}
+                accessibilityLabel="Activar de nuevo"
+                style={({ pressed }) => [
+                  styles.reactivateBtn,
+                  pressed && styles.reactivateBtnPressed,
+                ]}
+              >
+                <MaterialCommunityIcons name="bell-ring-outline" size={16} color={colors.primary} />
+                <Text style={styles.reactivateBtnTxt}>Activar de nuevo</Text>
+              </Pressable>
+            </View>
+          ) : null}
         </View>
       </View>
     </View>
@@ -82,11 +97,12 @@ function isSameAlertRowProps(previous: AlertRowProps, next: AlertRowProps): bool
   const nextAlert = next.alert;
   return (
     previous.onRemovePress === next.onRemovePress &&
+    previous.onReactivatePress === next.onReactivatePress &&
     previousAlert.id === nextAlert.id &&
     previousAlert.fsym === nextAlert.fsym &&
     previousAlert.kind === nextAlert.kind &&
     previousAlert.threshold === nextAlert.threshold &&
-    previousAlert.recurring === nextAlert.recurring
+    previousAlert.status === nextAlert.status
   );
 }
 
@@ -100,9 +116,15 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     ...cardShadow,
   },
+  alertCardNotified: {
+    backgroundColor: colors.surfaceContainerLow,
+  },
   alertAccentTop: {
     height: 3,
     width: "100%",
+  },
+  alertAccentMuted: {
+    opacity: 0.45,
   },
   alertCardInner: {
     flexDirection: "row",
@@ -154,35 +176,53 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     fontWeight: "700",
   },
-  alertRecChip: {
+  alertCondMuted: {
+    color: colors.onSurfaceVariant,
+  },
+  alertFooter: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  notifiedChip: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
     gap: 6,
-    marginTop: spacing.sm,
     paddingVertical: 5,
     paddingHorizontal: spacing.sm,
     borderRadius: radii.full,
     borderWidth: 1,
-  },
-  alertRecChipRecurring: {
-    backgroundColor: "rgba(35, 99, 145, 0.1)",
-    borderColor: "rgba(35, 99, 145, 0.35)",
-  },
-  alertRecChipOnce: {
-    backgroundColor: "rgba(123, 88, 0, 0.08)",
     borderColor: "rgba(123, 88, 0, 0.35)",
+    backgroundColor: "rgba(123, 88, 0, 0.08)",
   },
-  alertRecTxt: {
+  notifiedChipTxt: {
     ...typography.caption,
     fontWeight: "700",
     fontSize: 11,
-  },
-  alertRecTxtRecurring: {
-    color: colors.primary,
-  },
-  alertRecTxtOnce: {
     color: colors.secondary,
+  },
+  reactivateBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderColor: "rgba(35, 99, 145, 0.45)",
+    backgroundColor: "rgba(35, 99, 145, 0.08)",
+  },
+  reactivateBtnPressed: {
+    opacity: 0.9,
+    backgroundColor: "rgba(35, 99, 145, 0.16)",
+  },
+  reactivateBtnTxt: {
+    ...typography.caption,
+    fontWeight: "700",
+    fontSize: 11,
+    color: colors.primary,
   },
   alertTrash: {
     padding: spacing.xs,

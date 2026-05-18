@@ -1,4 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
+import { useQueryClient } from "@tanstack/react-query";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useCallback, useMemo, useState } from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
@@ -14,6 +15,7 @@ import { CreateAlertModal } from "../components/CreateAlertModal";
 import { MAX_MARKET_ASSETS_FOR_SUGGESTIONS } from "../constants/alertUiConstants";
 import { useAlerts } from "../hooks/useAlerts";
 import { ensureNotificationPermissions } from "../localNotifications";
+import { reactivateAlert } from "../runAlertEvaluation";
 import {
   flattenTopCoinsPages,
   useTopCoinsInfiniteQuery,
@@ -23,13 +25,13 @@ import type { StoredAlert } from "@/storage/alertsStorage";
 import { colors, spacing } from "@/core/theme";
 
 export function AlertsScreen() {
+  const queryClient = useQueryClient();
   const { alerts, ready, addAlert, removeAlert } = useAlerts();
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [selectedSymbol, setSelectedSymbol] = useState("");
   const [assetSearchText, setAssetSearchText] = useState("");
   const [thresholdText, setThresholdText] = useState("");
   const [selectedKind, setSelectedKind] = useState<AlertKind>("price_above");
-  const [isRecurring, setIsRecurring] = useState(true);
 
   const marketQuery = useTopCoinsInfiniteQuery("mcap", { enabled: isCreateModalVisible });
   const marketAssets = useMemo(
@@ -57,7 +59,6 @@ export function AlertsScreen() {
     setSelectedSymbol("");
     setThresholdText("");
     setSelectedKind("price_above");
-    setIsRecurring(true);
   }, []);
 
   const closeCreateAlertModal = useCallback(() => {
@@ -66,7 +67,6 @@ export function AlertsScreen() {
     setAssetSearchText("");
     setThresholdText("");
     setSelectedKind("price_above");
-    setIsRecurring(true);
   }, []);
 
   const handleSelectAsset = useCallback((symbol: string) => {
@@ -96,18 +96,10 @@ export function AlertsScreen() {
       );
       return;
     }
-    addAlert({ fsym: symbol, kind: selectedKind, threshold: thresholdValue, recurring: isRecurring });
+    addAlert({ fsym: symbol, kind: selectedKind, threshold: thresholdValue });
     closeCreateAlertModal();
     void ensureNotificationPermissions().catch(() => {});
-  }, [
-    selectedSymbol,
-    assetSearchText,
-    thresholdText,
-    selectedKind,
-    isRecurring,
-    addAlert,
-    closeCreateAlertModal,
-  ]);
+  }, [selectedSymbol, assetSearchText, thresholdText, selectedKind, addAlert, closeCreateAlertModal]);
 
   const removeAlertById = useCallback(
     (alertId: string) => {
@@ -116,11 +108,22 @@ export function AlertsScreen() {
     [removeAlert]
   );
 
+  const reactivateAlertById = useCallback(
+    (alertId: string) => {
+      void reactivateAlert(queryClient, alertId);
+    },
+    [queryClient]
+  );
+
   const renderAlertListItem = useCallback(
     ({ item }: { item: StoredAlert }) => (
-      <AlertRow alert={item} onRemovePress={removeAlertById} />
+      <AlertRow
+        alert={item}
+        onRemovePress={removeAlertById}
+        onReactivatePress={reactivateAlertById}
+      />
     ),
-    [removeAlertById]
+    [removeAlertById, reactivateAlertById]
   );
 
   const getAlertItemKey = useCallback((item: StoredAlert) => item.id, []);
@@ -178,8 +181,6 @@ export function AlertsScreen() {
         onThresholdTextChange={setThresholdText}
         selectedKind={selectedKind}
         onKindChange={setSelectedKind}
-        isRecurring={isRecurring}
-        onRecurringChange={setIsRecurring}
         suggestedAssets={suggestedAssets}
         isLoadingSuggestions={marketQuery.isPending && isCreateModalVisible}
         hasSuggestionsError={marketQuery.isError}

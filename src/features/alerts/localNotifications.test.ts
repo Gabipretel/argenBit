@@ -6,7 +6,7 @@ const baseAlert: StoredAlert = {
   fsym: "BTC",
   kind: "price_below",
   threshold: 78_184.13,
-  recurring: false,
+  status: "active",
 };
 
 describe("buildAlertNotificationContent", () => {

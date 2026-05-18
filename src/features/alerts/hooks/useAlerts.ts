@@ -27,9 +27,10 @@ export function useAlerts() {
     });
   }, []);
 
-  const addAlert = useCallback((rule: Omit<StoredAlert, "id">) => {
+  const addAlert = useCallback((rule: Omit<StoredAlert, "id" | "status">) => {
     const row: StoredAlert = {
       ...rule,
+      status: "active",
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     };
     setAlerts((prev) => {

@@ -5,14 +5,9 @@ import { useOfflineBannerInset } from "@/common/components/OfflineBanner";
 import { colors, spacing, typography } from "@/core/theme";
 
 interface AppTopBarProps {
-  /** Slot derecho (ej. estrella → Favoritos en §7.1.1b) */
   trailing?: ReactNode;
 }
 
-/**
- * Barra superior marca — sin menú ni sensors (spec).
- * Safe area: envolver pantalla con SafeAreaView `edges={['top']}`.
- */
 export function AppTopBar({ trailing }: AppTopBarProps) {
   const offlineBannerInset = useOfflineBannerInset();
 

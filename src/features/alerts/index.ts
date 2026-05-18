@@ -7,7 +7,11 @@ export { ExpoNotificationsHintBanner } from "./components/ExpoNotificationsHintB
 
 export { ensureNotificationPermissions } from "./localNotifications";
 
-export { enqueueAlertEvaluation, runAllAlertsEvaluation } from "./runAlertEvaluation";
+export {
+  enqueueAlertEvaluation,
+  reactivateAlert,
+  runAllAlertsEvaluation,
+} from "./runAlertEvaluation";
 
 export { useAlerts } from "./hooks/useAlerts";
 

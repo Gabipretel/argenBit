@@ -18,9 +18,6 @@ export function AlertsEmptyCallout({ onCreateAlertPress }: AlertsEmptyCalloutPro
         Creá avisos de precio o de variación del día. También podés usar el botón{" "}
         <Text style={styles.emptyPlus}>+</Text> arriba a la derecha.
       </Text>
-      <Text style={[typography.caption, styles.emptyFoot]}>
-        Tus alertas se guardan solo en este dispositivo. Te avisamos mientras usás la app o cuando la volvés a abrir.
-      </Text>
       <Pressable
         onPress={onCreateAlertPress}
         style={({ pressed }) => [styles.emptyCta, pressed && styles.emptyCtaPressed]}

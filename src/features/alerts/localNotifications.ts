@@ -85,24 +85,30 @@ export function buildAlertNotificationContent(
 export async function presentAlertTriggeredNotification(
   alert: StoredAlert,
   metrics: PriceMetrics
-): Promise<void> {
-  if (Platform.OS === "web") return;
+): Promise<boolean> {
+  if (Platform.OS === "web") return false;
   const Notifications = await loadNotifications();
-  if (!Notifications) return;
+  if (!Notifications) return false;
   await ensureAndroidAlertChannel();
   const ok = await ensureNotificationPermissions();
-  if (!ok) return;
+  if (!ok) return false;
 
   const { title, body } = buildAlertNotificationContent(alert, metrics);
 
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title,
-      body,
-      sound: "default",
-    },
-    trigger: null,
-  });
+  try {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `alert-${alert.id}-${Date.now()}`,
+      content: {
+        title,
+        body,
+        sound: "default",
+      },
+      trigger: null,
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Dev build con módulo nativo — verificar que llega una notificación local. */

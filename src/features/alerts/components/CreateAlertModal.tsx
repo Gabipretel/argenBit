@@ -7,7 +7,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   View,
@@ -41,8 +40,6 @@ export interface CreateAlertModalProps {
   onThresholdTextChange: (text: string) => void;
   selectedKind: AlertKind;
   onKindChange: (kind: AlertKind) => void;
-  isRecurring: boolean;
-  onRecurringChange: (value: boolean) => void;
   suggestedAssets: Asset[];
   isLoadingSuggestions: boolean;
   hasSuggestionsError: boolean;
@@ -62,8 +59,6 @@ export function CreateAlertModal({
   onThresholdTextChange,
   selectedKind,
   onKindChange,
-  isRecurring,
-  onRecurringChange,
   suggestedAssets,
   isLoadingSuggestions,
   hasSuggestionsError,
@@ -211,30 +206,6 @@ export function CreateAlertModal({
                   placeholderTextColor={colors.onSurfaceVariant}
                   keyboardType="decimal-pad"
                 />
-
-                <View style={styles.switchPanel}>
-                  <View style={styles.switchText}>
-                    <Text style={styles.switchTitle}>Avisar cada vez</Text>
-                    <Text style={styles.switchSub}>
-                      Si está apagado, solo avisamos la primera vez que se cumpla.
-                    </Text>
-                  </View>
-                  <Switch
-                    value={isRecurring}
-                    onValueChange={onRecurringChange}
-                    trackColor={{
-                      false: colors.outlineVariant,
-                      true: "rgba(35, 99, 145, 0.45)",
-                    }}
-                    thumbColor={
-                      Platform.OS === "android"
-                        ? isRecurring
-                          ? colors.primary
-                          : colors.surfaceContainerHigh
-                        : undefined
-                    }
-                  />
-                </View>
               </View>
             </ScrollView>
 
@@ -458,34 +429,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceBright,
     overflow: "hidden",
     ...cardShadow,
-  },
-  switchPanel: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: spacing.md,
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-    backgroundColor: colors.surfaceContainerLowest,
-    ...toolbarPanelShadow,
-  },
-  switchText: {
-    flex: 1,
-    minWidth: 0,
-  },
-  switchTitle: {
-    ...typography.labelMd,
-    color: colors.onSurface,
-    fontWeight: "700",
-  },
-  switchSub: {
-    ...typography.caption,
-    color: colors.onSurfaceVariant,
-    marginTop: 4,
-    lineHeight: 16,
   },
   modalActions: {
     flexDirection: "row",
