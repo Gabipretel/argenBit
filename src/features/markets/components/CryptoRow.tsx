@@ -14,22 +14,28 @@ const THUMB_SIZE = 44;
 interface Props {
   asset: Asset;
   onPress: () => void;
+  /** Serie 0–1 desde CoinStats `/coins/charts`; si falta, fallback decorativo. */
+  chartSparkPoints?: number[] | null;
 }
 
-export const CryptoRow = memo(function CryptoRow({ asset, onPress }: Props) {
-  const change1h =
-    typeof asset.priceChange1h === "number" && Number.isFinite(asset.priceChange1h)
-      ? asset.priceChange1h
+export const CryptoRow = memo(function CryptoRow({
+  asset,
+  onPress,
+  chartSparkPoints,
+}: Props) {
+  const change24h =
+    typeof asset.changePercent24Hr === "number" && Number.isFinite(asset.changePercent24Hr)
+      ? asset.changePercent24Hr
       : 0;
-  const positive = change1h > 0;
-  const negative = change1h < 0;
+  const positive = change24h > 0;
+  const negative = change24h < 0;
   const [imageFailed, setImageFailed] = useState(false);
 
   const tone: SparkTone = positive ? "up" : negative ? "down" : "flat";
-  const sparkPoints = useMemo(
-    () => buildSparkSeries(asset.fsym, change1h),
-    [asset.fsym, change1h]
-  );
+  const sparkPoints = useMemo(() => {
+    if (chartSparkPoints && chartSparkPoints.length >= 2) return chartSparkPoints;
+    return buildSparkSeries(asset.fsym, change24h);
+  }, [asset.fsym, change24h, chartSparkPoints]);
 
   useEffect(() => {
     setImageFailed(false);
@@ -99,8 +105,8 @@ export const CryptoRow = memo(function CryptoRow({ asset, onPress }: Props) {
                   !positive && !negative && styles.txtNeutral,
                 ]}
               >
-                {change1h >= 0 ? "+" : ""}
-                {change1h.toFixed(2)}%
+                {change24h >= 0 ? "+" : ""}
+                {change24h.toFixed(2)}%
               </Text>
             </View>
           </View>
@@ -118,8 +124,9 @@ function pricePropsEqual(prev: Props, next: Props) {
     a.name === b.name &&
     a.symbolDisplay === b.symbolDisplay &&
     a.priceUsd === b.priceUsd &&
-    a.priceChange1h === b.priceChange1h &&
-    a.imageUrl === b.imageUrl
+    a.changePercent24Hr === b.changePercent24Hr &&
+    a.imageUrl === b.imageUrl &&
+    prev.chartSparkPoints === next.chartSparkPoints
   );
 }
 

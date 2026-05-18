@@ -1,6 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { filtersSlice, setMarketPreset } from "@/core/store/slices/filtersSlice";
+import {
+  filtersSlice,
+  setChangeFilter,
+  setMarketPreset,
+} from "@/core/store/slices/filtersSlice";
 import type { Asset } from "@/domain/models/Asset";
 
 import { selectFilteredMarketAssets } from "./marketSelectors";
@@ -36,6 +40,18 @@ describe("selectFilteredMarketAssets", () => {
 
     const sorted = selectFilteredMarketAssets(store.getState(), rows);
     expect(sorted.map((a) => a.fsym)).toEqual(["BTC", "ETH", "DOGE"]);
+  });
+
+  it("changeFilter gainers solo deja activos con variación 24h positiva", () => {
+    const mixed = [
+      asset({ fsym: "BTC", priceUsd: 1, rank: 1, changePercent24Hr: 2 }),
+      asset({ fsym: "ETH", priceUsd: 1, rank: 2, changePercent24Hr: -1 }),
+    ];
+    const store = configureStore({ reducer: { filters: filtersSlice.reducer } });
+    store.dispatch(setChangeFilter("gainers"));
+    expect(selectFilteredMarketAssets(store.getState(), mixed).map((a) => a.fsym)).toEqual([
+      "BTC",
+    ]);
   });
 
   it("preset supply ordena por supply circulante descendente", () => {

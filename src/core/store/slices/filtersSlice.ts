@@ -10,14 +10,19 @@ export function dataFeedForPreset(preset: MarketPreset): MarketDataFeedKind {
   return preset === "volume" ? "volume" : "mcap";
 }
 
+/** Filtro client-side sobre la lista cargada (combinable con búsqueda y preset). */
+export type MarketChangeFilter = "all" | "gainers" | "losers";
+
 export interface FiltersState {
   searchTerm: string;
   marketPreset: MarketPreset;
+  changeFilter: MarketChangeFilter;
 }
 
 const initialState: FiltersState = {
   searchTerm: "",
   marketPreset: "cap100",
+  changeFilter: "all",
 };
 
 export const filtersSlice = createSlice({
@@ -30,10 +35,14 @@ export const filtersSlice = createSlice({
     setMarketPreset(state, action: PayloadAction<MarketPreset>) {
       state.marketPreset = action.payload;
     },
+    setChangeFilter(state, action: PayloadAction<MarketChangeFilter>) {
+      state.changeFilter = action.payload;
+    },
     resetFilters(state) {
       state.searchTerm = "";
     },
   },
 });
 
-export const { setSearchTerm, setMarketPreset, resetFilters } = filtersSlice.actions;
+export const { setSearchTerm, setMarketPreset, setChangeFilter, resetFilters } =
+  filtersSlice.actions;

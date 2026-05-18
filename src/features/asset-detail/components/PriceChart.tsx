@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,16 +10,21 @@ import {
 } from "react-native";
 
 import { buildSparkSeries } from "@/common/utils/sparkSeries";
-import type { PriceChangeHorizonPoint } from "@/domain/models/PriceChangeHorizon";
+import type { CoinChartPeriod } from "@/core/api/dto/coinChart";
+import {
+  COIN_CHART_PERIODS,
+  DEFAULT_COIN_CHART_PERIOD,
+} from "@/core/config/coinChartPeriods";
 import {
   MiniSparkline,
   type SparkTone,
 } from "@/features/markets/components/MiniSparkline";
+import { useCoinChartQuery } from "../hooks/useCoinChartQuery";
 import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
 
 interface Props {
+  coinId: string;
   fsym: string;
-  points: PriceChangeHorizonPoint[];
 }
 
 function toneFromChangePct(changePct: number): SparkTone {
@@ -33,32 +39,21 @@ function formatPct(n: number): string {
   return `${sign}${rounded}%`;
 }
 
-/** Rendimiento en detalle: chips por ventana + spark + % de la ventana activa. */
-export function PriceChart({ fsym, points }: Props) {
+/** Histórico CoinStats por periodo API (24h, 1w, 1m, …). */
+export function PriceChart({ coinId, fsym }: Props) {
   const { width: screenW } = useWindowDimensions();
   const chartWidth = Math.max(200, screenW - spacing.lg * 2);
-  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [period, setPeriod] = useState<CoinChartPeriod>(DEFAULT_COIN_CHART_PERIOD);
+  const chartQuery = useCoinChartQuery(coinId, period);
 
-  const safeIdx =
-    selectedIdx >= 0 && selectedIdx < points.length ? selectedIdx : 0;
-  const selected = points[safeIdx];
-  const changePct = selected?.changePct ?? 0;
+  const changePct = chartQuery.data?.changePct ?? 0;
+  const sparkPoints = useMemo(() => {
+    const fromApi = chartQuery.data?.sparkPoints;
+    if (fromApi && fromApi.length >= 2) return fromApi;
+    return buildSparkSeries(fsym, changePct);
+  }, [chartQuery.data?.sparkPoints, fsym, changePct]);
 
-  const sparkPoints = useMemo(
-    () => buildSparkSeries(fsym, changePct),
-    [fsym, changePct]
-  );
   const tone = useMemo(() => toneFromChangePct(changePct), [changePct]);
-
-  if (points.length < 2 || sparkPoints.length < 2) {
-    return (
-      <View style={[styles.box, styles.center]}>
-        <Text style={[typography.bodyMd, styles.emptyTxt]}>
-          Rendimiento no disponible para este activo.
-        </Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.wrap}>
@@ -70,19 +65,20 @@ export function PriceChart({ fsym, points }: Props) {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.segmentRowContent}
         >
-          {points.map((p, idx) => {
-            const active = idx === safeIdx;
+          {COIN_CHART_PERIODS.map(({ period: p, label }) => {
+            const active = p === period;
             return (
               <Pressable
-                key={p.label}
-                onPress={() => setSelectedIdx(idx)}
+                key={p}
+                testID={`chart-period-${p}`}
+                onPress={() => setPeriod(p)}
                 style={[styles.segment, active && styles.segmentActive]}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
-                accessibilityLabel={`Ventana ${p.label}, variación ${formatPct(p.changePct)}`}
+                accessibilityLabel={`Periodo ${label}`}
               >
                 <Text style={[styles.segmentTxt, active && styles.segmentTxtActive]}>
-                  {p.label}
+                  {label}
                 </Text>
               </Pressable>
             );
@@ -100,12 +96,16 @@ export function PriceChart({ fsym, points }: Props) {
         >
           {formatPct(changePct)}
         </Text>
-        <MiniSparkline
-          points={sparkPoints}
-          tone={tone}
-          width={chartWidth - spacing.md * 2}
-          height={120}
-        />
+        {chartQuery.isPending && !chartQuery.data ? (
+          <ActivityIndicator color={colors.primary} style={styles.chartLoader} />
+        ) : (
+          <MiniSparkline
+            points={sparkPoints}
+            tone={tone}
+            width={chartWidth - spacing.md * 2}
+            height={120}
+          />
+        )}
       </View>
     </View>
   );
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   segmentStrip: {
     alignSelf: "stretch",
-    height: 46,
+    minHeight: 46,
     marginBottom: spacing.sm,
     flexGrow: 0,
     flexShrink: 0,
@@ -166,17 +166,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...cardShadow,
   },
-  center: {
-    height: 168,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.lg,
-  },
-  emptyTxt: {
-    textAlign: "center",
-    color: colors.onSurfaceVariant,
-  },
   selectedPct: {
     ...typography.headlineMd,
     fontWeight: "700",
@@ -189,5 +178,8 @@ const styles = StyleSheet.create({
   },
   pctDown: {
     color: colors.error,
+  },
+  chartLoader: {
+    marginVertical: spacing.xl,
   },
 });

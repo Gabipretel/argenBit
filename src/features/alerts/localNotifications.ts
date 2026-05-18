@@ -42,18 +42,39 @@ function formatUsd(n: number): string {
   }).format(n);
 }
 
-function describeTrigger(alert: StoredAlert, metrics: PriceMetrics): string {
+/** Título y cuerpo legibles para la notificación local (sin símbolos ≤ / ≥). */
+export function buildAlertNotificationContent(
+  alert: StoredAlert,
+  metrics: PriceMetrics
+): { title: string; body: string } {
+  const sym = alert.fsym.trim().toUpperCase();
+  const price = formatUsd(metrics.priceUsd);
+  const target = formatUsd(alert.threshold);
+  const pct = metrics.changePercent24Hr;
+
   switch (alert.kind) {
-    case "price_above":
-      return `Precio ${formatUsd(metrics.priceUsd)} ≥ ${formatUsd(alert.threshold)}`;
     case "price_below":
-      return `Precio ${formatUsd(metrics.priceUsd)} ≤ ${formatUsd(alert.threshold)}`;
+      return {
+        title: `${sym}: bajó de tu precio`,
+        body: `Está en ${price}. Tu alerta era por debajo de ${target}.`,
+      };
+    case "price_above":
+      return {
+        title: `${sym}: subió de tu precio`,
+        body: `Ahora vale ${price}. Configuraste aviso por encima de ${target}.`,
+      };
     case "pct_up":
-      return `Variación 24h ${metrics.changePercent24Hr.toFixed(2)}% ≥ ${alert.threshold}%`;
+      return {
+        title: `${sym}: subida en 24 h`,
+        body: `Variación ${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%. Pediste aviso si superaba ${alert.threshold}%.`,
+      };
     case "pct_down":
-      return `Variación 24h ${metrics.changePercent24Hr.toFixed(2)}% ≤ −${Math.abs(alert.threshold)}%`;
+      return {
+        title: `${sym}: caída en 24 h`,
+        body: `Variación ${pct.toFixed(2)}%. Pediste aviso si caía más de ${Math.abs(alert.threshold)}%.`,
+      };
     default:
-      return "";
+      return { title: `Alerta · ${sym}`, body: "Se cumplió una condición que configuraste." };
   }
 }
 
@@ -72,10 +93,12 @@ export async function presentAlertTriggeredNotification(
   const ok = await ensureNotificationPermissions();
   if (!ok) return;
 
+  const { title, body } = buildAlertNotificationContent(alert, metrics);
+
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: `Alerta · ${alert.fsym}`,
-      body: describeTrigger(alert, metrics),
+      title,
+      body,
       sound: "default",
     },
     trigger: null,

@@ -27,9 +27,12 @@ import { AnimatedUsdPrice } from "@/features/markets/components/AnimatedUsdPrice
 import { CryptoRowSkeletonList } from "@/features/markets/components/CryptoRowSkeleton";
 import { useFavorites } from "@/features/favorites/FavoritesContext";
 import { AssetDetailSkeleton } from "../components/AssetDetailSkeleton";
+import {
+  coinChartPeriodLabel,
+  DEFAULT_COIN_CHART_PERIOD,
+} from "@/core/config/coinChartPeriods";
 import { PriceChart } from "../components/PriceChart";
 import { useAssetDetailQuery } from "../hooks/useAssetDetailQuery";
-import { priceChangeHorizonsFromDetail } from "../utils/priceChangeHorizons";
 import { cardShadow, colors, radii, spacing, typography } from "@/core/theme";
 
 export function AssetDetailScreen() {
@@ -50,10 +53,6 @@ export function AssetDetailScreen() {
   useBinancePriceStream([fsym.trim().toUpperCase()], isFocused);
 
   const detailQuery = useAssetDetailQuery(fsym, coinId, displayName);
-  const horizonPoints = useMemo(
-    () => (detailQuery.data ? priceChangeHorizonsFromDetail(detailQuery.data) : []),
-    [detailQuery.data]
-  );
 
   useLayoutEffect(() => {
     const label = (displayName?.trim() || fsym.toUpperCase()).trim();
@@ -120,8 +119,10 @@ export function AssetDetailScreen() {
   }
 
   const d = detailQuery.data;
-  const positive = d.priceChange1h > 0;
-  const negative = d.priceChange1h < 0;
+  const change24h = d.priceChange1d;
+  const positive = change24h > 0;
+  const negative = change24h < 0;
+  const chartPeriodLabel = coinChartPeriodLabel(DEFAULT_COIN_CHART_PERIOD);
 
   return (
     <View style={styles.pageRoot}>
@@ -182,17 +183,17 @@ export function AssetDetailScreen() {
                       !positive && !negative && styles.changeTxtNeutral,
                     ]}
                   >
-                    {d.priceChange1h >= 0 ? "+" : ""}
-                    {d.priceChange1h.toFixed(2)}%
+                    {change24h >= 0 ? "+" : ""}
+                    {change24h.toFixed(2)}%
                   </Text>
                 </View>
               </View>
             </View>
-            <Text style={styles.heroSubnote}>Variación 1 h</Text>
+            <Text style={styles.heroSubnote}>Variación {chartPeriodLabel}</Text>
           </View>
 
           <Text style={styles.sectionTitle}>Rendimiento</Text>
-          <PriceChart fsym={d.fsym} points={horizonPoints} />
+          <PriceChart key={d.coinId} coinId={d.coinId} fsym={d.fsym} />
 
           <Text style={styles.sectionTitleMetrics}>Métricas</Text>
           <View style={styles.grid}>

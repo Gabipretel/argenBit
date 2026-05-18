@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import {
   filtersSlice,
   resetFilters,
+  setChangeFilter,
   setMarketPreset,
   setSearchTerm,
 } from "@/core/store/slices/filtersSlice";
@@ -18,6 +19,12 @@ describe("filtersSlice", () => {
     const store = configureStore({ reducer: { filters: filtersSlice.reducer } });
     store.dispatch(setMarketPreset("volume"));
     expect(store.getState().filters.marketPreset).toBe("volume");
+  });
+
+  it("setChangeFilter actualiza filtro de variación", () => {
+    const store = configureStore({ reducer: { filters: filtersSlice.reducer } });
+    store.dispatch(setChangeFilter("gainers"));
+    expect(store.getState().filters.changeFilter).toBe("gainers");
   });
 
   it("resetFilters solo limpia búsqueda", () => {

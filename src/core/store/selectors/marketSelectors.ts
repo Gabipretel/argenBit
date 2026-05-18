@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import type { Asset } from "@/domain/models/Asset";
-import type { MarketPreset } from "@/core/store/slices/filtersSlice";
+import type { MarketChangeFilter, MarketPreset } from "@/core/store/slices/filtersSlice";
 import type { RootState } from "@/core/store";
 
 function sortForPreset(rows: Asset[], preset: MarketPreset): Asset[] {
@@ -31,13 +31,25 @@ function sortForPreset(rows: Asset[], preset: MarketPreset): Asset[] {
   return out;
 }
 
+function applyChangeFilter(rows: Asset[], changeFilter: MarketChangeFilter): Asset[] {
+  switch (changeFilter) {
+    case "gainers":
+      return rows.filter((a) => a.changePercent24Hr > 0);
+    case "losers":
+      return rows.filter((a) => a.changePercent24Hr < 0);
+    default:
+      return rows;
+  }
+}
+
 export const selectFilteredMarketAssets = createSelector(
   [
     (_state: RootState, assets: Asset[]) => assets,
     (state: RootState) => state.filters.marketPreset,
     (state: RootState) => state.filters.searchTerm,
+    (state: RootState) => state.filters.changeFilter,
   ],
-  (assets, marketPreset, searchTerm) => {
+  (assets, marketPreset, searchTerm, changeFilter) => {
     let rows = [...assets];
     const q = searchTerm.trim().toLowerCase();
     if (q) {
@@ -48,6 +60,7 @@ export const selectFilteredMarketAssets = createSelector(
           a.fsym.toLowerCase().includes(q)
       );
     }
+    rows = applyChangeFilter(rows, changeFilter);
     return sortForPreset(rows, marketPreset);
   }
 );

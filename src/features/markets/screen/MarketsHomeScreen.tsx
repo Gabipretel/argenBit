@@ -41,10 +41,19 @@ import type { MainTabParamList, MarketsStackParamList } from "@/core/navigation/
 import type { Asset } from "@/domain/models/Asset";
 import {
   dataFeedForPreset,
+  setChangeFilter,
   setMarketPreset,
   setSearchTerm,
 } from "@/core/store/slices/filtersSlice";
-import type { FiltersState, MarketPreset } from "@/core/store/slices/filtersSlice";
+import type {
+  FiltersState,
+  MarketChangeFilter,
+  MarketPreset,
+} from "@/core/store/slices/filtersSlice";
+import {
+  MARKETS_CHART_BATCH_SIZE,
+  useMarketsSparkChartsQuery,
+} from "../hooks/useMarketsSparkChartsQuery";
 import { selectFilteredMarketAssets } from "@/core/store/selectors/marketSelectors";
 import type { RootState } from "@/core/store";
 import { cardShadow, colors, radii, spacing, toolbarPanelShadow, typography } from "@/core/theme";
@@ -97,17 +106,58 @@ function FilterTile({
   );
 }
 
+function ChangeFilterChip({
+  active,
+  label,
+  onPress,
+}: {
+  active: boolean;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[styles.changeChip, active && styles.changeChipOn]}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+    >
+      <Text style={[styles.changeChipTxt, active && styles.changeChipTxtOn]}>{label}</Text>
+    </Pressable>
+  );
+}
+
 function MarketsToolbar({
   filters,
   onSelectPreset,
+  onSelectChangeFilter,
 }: {
   filters: FiltersState;
   onSelectPreset: (p: MarketPreset) => void;
+  onSelectChangeFilter: (f: MarketChangeFilter) => void;
 }) {
   const p = filters.marketPreset;
+  const cf = filters.changeFilter;
   return (
     <View style={styles.toolbarWrap}>
       <Text style={[typography.headlineMd, styles.sectionTitle]}>Mercados</Text>
+      <View style={styles.changeRow}>
+        <ChangeFilterChip
+          active={cf === "all"}
+          label="Todos"
+          onPress={() => onSelectChangeFilter("all")}
+        />
+        <ChangeFilterChip
+          active={cf === "gainers"}
+          label="Suben"
+          onPress={() => onSelectChangeFilter("gainers")}
+        />
+        <ChangeFilterChip
+          active={cf === "losers"}
+          label="Bajan"
+          onPress={() => onSelectChangeFilter("losers")}
+        />
+      </View>
       <View style={styles.grid2}>
         <View style={styles.gridRow}>
           <FilterTile
@@ -184,6 +234,20 @@ export function MarketsHomeScreen() {
     selectFilteredMarketAssets(state, listBase)
   );
 
+  const chartCoinIds = useMemo(() => {
+    const ids: string[] = [];
+    const seen = new Set<string>();
+    for (const a of filtered) {
+      if (seen.has(a.coinId)) continue;
+      seen.add(a.coinId);
+      ids.push(a.coinId);
+      if (ids.length >= MARKETS_CHART_BATCH_SIZE) break;
+    }
+    return ids;
+  }, [filtered]);
+
+  const sparkChartsQuery = useMarketsSparkChartsQuery(chartCoinIds, isFocused);
+
   const streamSymbols = useMemo(() => {
     const out: string[] = [];
     const seen = new Set<string>();
@@ -209,6 +273,10 @@ export function MarketsHomeScreen() {
 
   const onSelectPreset = (preset: MarketPreset) => {
     dispatch(setMarketPreset(preset));
+  };
+
+  const onSelectChangeFilter = (changeFilter: MarketChangeFilter) => {
+    dispatch(setChangeFilter(changeFilter));
   };
 
   const isMarketListRefreshing =
@@ -267,7 +335,11 @@ export function MarketsHomeScreen() {
           contentContainerStyle={styles.skeletonScroll}
           keyboardShouldPersistTaps="handled"
         >
-          <MarketsToolbar filters={filters} onSelectPreset={onSelectPreset} />
+          <MarketsToolbar
+            filters={filters}
+            onSelectPreset={onSelectPreset}
+            onSelectChangeFilter={onSelectChangeFilter}
+          />
           {Array.from({ length: 10 }).map((_, i) => (
             <CryptoRowSkeleton key={i} />
           ))}
@@ -334,12 +406,16 @@ export function MarketsHomeScreen() {
         ) : null}
         <FlashList
           ref={listRef}
-          key={`${feedKind}-${filters.marketPreset}`}
-          extraData={`${query.dataUpdatedAt}-${query.isFetchingNextPage}-${showLoadMoreMinHold}`}
+          key={`${feedKind}-${filters.marketPreset}-${filters.changeFilter}`}
+          extraData={`${query.dataUpdatedAt}-${sparkChartsQuery.dataUpdatedAt}-${query.isFetchingNextPage}-${showLoadMoreMinHold}`}
           style={styles.flashFlex}
           data={filtered}
           renderItem={({ item }) => (
-            <CryptoRow asset={item} onPress={() => onPressAsset(item)} />
+            <CryptoRow
+              asset={item}
+              chartSparkPoints={sparkChartsQuery.data?.[item.coinId]}
+              onPress={() => onPressAsset(item)}
+            />
           )}
           keyExtractor={(item) => item.fsym}
           contentContainerStyle={styles.listContent}
@@ -348,7 +424,11 @@ export function MarketsHomeScreen() {
           onEndReachedThreshold={LIST_PAGINATION_END_THRESHOLD}
           ListHeaderComponent={
             <>
-              <MarketsToolbar filters={filters} onSelectPreset={onSelectPreset} />
+              <MarketsToolbar
+                filters={filters}
+                onSelectPreset={onSelectPreset}
+                onSelectChangeFilter={onSelectChangeFilter}
+              />
               {emptyFilter ? (
                 <EmptyMarketsBanner searchTerm={filters.searchTerm} />
               ) : null}
@@ -420,6 +500,33 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
     marginTop: 0,
     color: colors.primary,
+  },
+  changeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  changeChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 8,
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+    backgroundColor: colors.surfaceContainerLowest,
+  },
+  changeChipOn: {
+    borderColor: colors.primary,
+    backgroundColor: "rgba(35, 99, 145, 0.1)",
+  },
+  changeChipTxt: {
+    ...typography.labelMd,
+    color: colors.onSurfaceVariant,
+    fontWeight: "600",
+  },
+  changeChipTxtOn: {
+    color: colors.primary,
+    fontWeight: "700",
   },
   grid2: {
     gap: spacing.sm,

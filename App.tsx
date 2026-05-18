@@ -13,7 +13,7 @@ import {
   type Theme as NavigationTheme,
 } from "@react-navigation/native";
 
-import { AlertLifecycle, AppErrorFallback, useAppFonts } from "@/common";
+import { AlertLifecycle, AppErrorFallback, OfflineBanner, useAppFonts } from "@/common";
 import { FavoritesProvider } from "@/features/favorites";
 import "@/core/config/dayjsLocale";
 import { queryClient } from "@/core/config/queryClient";
@@ -63,9 +63,12 @@ export default function App() {
             <FavoritesProvider>
               <AlertLifecycle />
               <ErrorBoundary FallbackComponent={AppErrorFallback}>
-                <NavigationContainer theme={navigationTheme}>
-                  <AppNavigator />
-                </NavigationContainer>
+                <View style={styles.appShell}>
+                  <NavigationContainer theme={navigationTheme}>
+                    <AppNavigator />
+                  </NavigationContainer>
+                  <OfflineBanner />
+                </View>
               </ErrorBoundary>
               <StatusBar style="dark" />
             </FavoritesProvider>
@@ -78,6 +81,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+  },
+  appShell: {
     flex: 1,
   },
   boot: {

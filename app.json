@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "deploymentTarget": "16.0",
+
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "argenBit envía avisos cuando se cumple una alerta de precio o variación que configuraste."
       },

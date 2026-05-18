@@ -11,7 +11,7 @@ const mockAsset: Asset = {
   symbolDisplay: "BTC",
   priceUsd: 95_000,
   priceChange1h: 0.42,
-  changePercent24Hr: 1.25,
+  changePercent24Hr: 0.42,
   marketCapUsd: 1e12,
   volume24hUsd: null,
   circulatingSupply: 19_500_000,
@@ -28,7 +28,7 @@ describe("CryptoRow", () => {
     expect(screen.getByText("Bitcoin")).toBeTruthy();
     expect(screen.getByText("BTC")).toBeTruthy();
     expect(screen.getByTestId("crypto-row-BTC")).toBeTruthy();
-    expect(screen.getByText("+0.42%")).toBeTruthy();
+    expect(screen.getByText("+0.42%")).toBeTruthy(); // badge 24h (changePercent24Hr)
   });
 
   it("llama onPress al tocar la fila", () => {

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
+import { useOfflineBannerInset } from "@/common/components/OfflineBanner";
 import { colors, spacing, typography } from "@/core/theme";
 
 interface AppTopBarProps {
@@ -13,8 +14,10 @@ interface AppTopBarProps {
  * Safe area: envolver pantalla con SafeAreaView `edges={['top']}`.
  */
 export function AppTopBar({ trailing }: AppTopBarProps) {
+  const offlineBannerInset = useOfflineBannerInset();
+
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, offlineBannerInset > 0 && { marginTop: offlineBannerInset }]}>
       <View style={styles.side} />
       <Text style={styles.title}>
         <Text style={styles.argen}>argen</Text>
